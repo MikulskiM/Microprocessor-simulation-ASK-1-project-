@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <cmath>
+
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -15,6 +17,69 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+std::string addBinary(std::string a, std::string b){
+    std::string result = ""; // Initialize result
+    int s = 0;          // Initialize digit sum
+
+    // Traverse both strings starting from last
+    // characters
+    int i = a.size() - 1, j = b.size() - 1;
+    while (i >= 0 || j >= 0 || s == 1)
+    {
+        // Comput sum of last digits and carry
+        s += ((i >= 0)? a[i] - '0': 0);
+        s += ((j >= 0)? b[j] - '0': 0);
+
+        // If current digit sum is 1 or 3, add 1 to result
+        result = char(s % 2 + '0') + result;
+
+        // Compute carry
+        s /= 2;
+
+        // Move to next digits
+        i--; j--;
+    }
+    return result;
+}
+
+int binary_to_int(std::string input){
+    char* start = &input[0];
+    int total = 0;
+    while (*start)
+    {
+     total *= 2;
+     if (*start++ == '1') total += 1;
+    }
+    return total;
+}
+
+std::string decimal_to_binary(int n){
+    // array to store binary number
+        int binaryNum[32];
+
+        // counter for binary array
+        int i = 0;
+        while (n > 0) {
+
+            // storing remainder in binary array
+            binaryNum[i] = n % 2;
+            n = n / 2;
+            i++;
+        }
+
+        int binary=0;
+        // printing binary array in reverse order
+        for (int j = i - 1; j >= 0; j--)
+            //std::cout << binaryNum[j];
+
+        for (int j = i - 1; j >= 0; j--)
+            binary += binaryNum[j]*pow(10, j);
+
+        char* result;
+        itoa(binary, result, 10);
+
+        return result;
+}
 
 // =============================================    RADIOBUTTONS CLICKED
 // ------------------------------------------------------------------ A 1
