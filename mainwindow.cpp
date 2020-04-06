@@ -3,7 +3,9 @@
 
 #include <cmath>
 
-
+#define MOV 0
+#define ADD 1
+#define SUB 2
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -632,4 +634,186 @@ void MainWindow::on_wpisz_button_d_clicked(){
     register_dh = register_input_dh;
     ui->d_register_l->setText(QString::fromStdString(register_dl));
     ui->d_register_h->setText(QString::fromStdString(register_dh));
+}
+
+void MainWindow::on_combo_box_order_currentIndexChanged(int index)
+{
+    int chosen_order = ui->combo_box_order->currentIndex();
+    if(chosen_order == SUB){
+        ui->label_one->setText("-");
+        ui->label_two->setEnabled(true);
+        ui->label_two->setText("=>");
+        ui->combo_box_three->setEnabled(true);
+    }else if(chosen_order == ADD){
+        ui->label_one->setText("+");
+        ui->label_two->setEnabled(true);
+        ui->label_two->setText("=>");
+        ui->combo_box_three->setEnabled(true);
+    }else{  // MOV
+        ui->label_one->setText("=>");
+        ui->label_two->setText("");
+        ui->label_two->setEnabled(false);
+        ui->combo_box_three->setCurrentText("");
+        ui->combo_box_three->setEnabled(false);
+    }
+
+    /*  sprawdzanie jakie numery mają które ordery
+    QString s = QString::number(chosen_order);
+    ui->label_one->setText(s);
+    */
+}
+
+void MainWindow::on_perform_order_button_clicked(){
+    int order = ui->combo_box_order->currentIndex();
+    if(order == MOV){   // ================================= PRZENOSZENIE
+        std::string from_h, from_l;
+        if(ui->combo_box_one->currentText() == "A"){
+            from_h = register_ah;
+            from_l = register_al;
+        }else if(ui->combo_box_one->currentText() == "B"){
+            from_h = register_bh;
+            from_l = register_bl;
+        }else if(ui->combo_box_one->currentText() == "C"){
+            from_h = register_ch;
+            from_l = register_cl;
+        }else if(ui->combo_box_one->currentText() == "D"){
+            from_h = register_dh;
+            from_l = register_dl;
+        }else{
+            ui->combo_box_one->setCurrentText("ERROR");
+        }
+        if(ui->combo_box_two->currentText() == "A"){
+            register_ah = from_h;
+            register_al = from_l;
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+        }else if(ui->combo_box_two->currentText() == "B"){
+            register_bh = from_h;
+            register_bl = from_l;
+            ui->b_register_l->setText(QString::fromStdString(register_bl));
+            ui->b_register_h->setText(QString::fromStdString(register_bh));
+        }else if(ui->combo_box_two->currentText() == "C"){
+            register_ch = from_h;
+            register_cl = from_l;
+            ui->c_register_l->setText(QString::fromStdString(register_cl));
+            ui->c_register_h->setText(QString::fromStdString(register_ch));
+        }else if(ui->combo_box_two->currentText() == "D"){
+            register_dh = from_h;
+            register_dl = from_l;
+            ui->d_register_l->setText(QString::fromStdString(register_dl));
+            ui->d_register_h->setText(QString::fromStdString(register_dh));
+        }else{
+            ui->combo_box_two->setCurrentText("ERROR");
+        }
+
+    }else if(order == ADD){ // =========================== DODAWANIE
+        std::string first, second, answer;
+        if(ui->combo_box_one->currentText() == "A"){
+            first = register_ah + register_al;
+        }else if(ui->combo_box_one->currentText() == "B"){
+            first = register_bh + register_bl;
+        }else if(ui->combo_box_one->currentText() == "C"){
+            first = register_ch + register_cl;
+        }else if(ui->combo_box_one->currentText() == "D"){
+            first = register_dh + register_dl;
+        }else{
+            ui->combo_box_one->setCurrentText("ERROR");
+        }
+        if(ui->combo_box_two->currentText() == "A"){
+            second = register_ah + register_al;
+        }else if(ui->combo_box_two->currentText() == "B"){
+            second = register_bh + register_bl;
+        }else if(ui->combo_box_two->currentText() == "C"){
+            second = register_ch + register_cl;
+        }else if(ui->combo_box_two->currentText() == "D"){
+            second = register_dh + register_dl;
+        }else{
+            ui->combo_box_two->setCurrentText("ERROR");
+        }
+        if(ui->combo_box_three->currentText() == "A"){
+            answer = addBinary(first, second);
+            register_ah = "";
+            register_al = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ah = register_ah + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_al = register_al + answer[i];
+            }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ah = register_ah + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_al = register_al + answer[i];
+            }else{
+                register_ah = "ERROR";
+                register_al = "ERROR";
+            }
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+        }else if(ui->combo_box_three->currentText() == "B"){
+            answer = addBinary(first, second);
+            register_bh = "";
+            register_bl = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_bh = register_bh + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_bl = register_bl + answer[i];
+            }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_bh = register_bh + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_bl = register_bl + answer[i];
+            }else{
+                register_bh = "ERROR";
+                register_bl = "ERROR";
+            }
+            ui->b_register_l->setText(QString::fromStdString(register_bl));
+            ui->b_register_h->setText(QString::fromStdString(register_bh));
+        }else if(ui->combo_box_three->currentText() == "C"){
+            answer = addBinary(first, second);
+            register_ch = "";
+            register_cl = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ch = register_ch + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_cl = register_cl + answer[i];
+            }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ch = register_ch + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_cl = register_cl + answer[i];
+            }else{
+                register_ch = "ERROR";
+                register_cl = "ERROR";
+            }
+            ui->c_register_l->setText(QString::fromStdString(register_cl));
+            ui->c_register_h->setText(QString::fromStdString(register_ch));
+        }else if(ui->combo_box_three->currentText() == "D"){
+            answer = addBinary(first, second);
+            register_dh = "";
+            register_dl = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_dh = register_dh + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_dl = register_dl + answer[i];
+            }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_dh = register_dh + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_dl = register_dl + answer[i];
+            }else{
+                register_dh = "ERROR";
+                register_dl = "ERROR";
+            }
+            ui->d_register_l->setText(QString::fromStdString(register_dl));
+            ui->d_register_h->setText(QString::fromStdString(register_dh));
+        }else{
+            ui->combo_box_three->setCurrentText("ERROR");
+        }
+    }else{  // ============================ ODEJMOWANIE
+
+    }
 }

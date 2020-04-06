@@ -34,13 +34,14 @@ public:
     std::string register_dh = "00000000";
     std::string register_dl = "00000000";
 
-    std::string addBinary(std::string a, std::string b);
+    // std::string addBinary(std::string a, std::string b);
     int binary_to_int(std::string x);
     std::string decimal_to_binary(int n);
 
     // ----
 
 private slots:
+
     void on_radioButton_a1_15_clicked();
     void on_radioButton_a1_14_clicked();
     void on_radioButton_a1_13_clicked();
@@ -182,6 +183,10 @@ private slots:
     void on_wpisz_button_b_clicked();
     void on_wpisz_button_d_clicked();
 
+
+    void on_combo_box_order_currentIndexChanged(int index);
+
+    void on_perform_order_button_clicked();
 
 private:
     Ui::MainWindow *ui;
