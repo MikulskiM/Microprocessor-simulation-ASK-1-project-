@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <cmath>
+#include <iostream>
 
 #define MOV 0
 #define ADD 1
@@ -55,33 +56,36 @@ int binary_to_int(std::string input){
     return total;
 }
 
-std::string decimal_to_binary(int n){
-    // array to store binary number
-        int binaryNum[32];
+std::string decimal_to_binary(int x){
 
-        // counter for binary array
-        int i = 0;
-        while (n > 0) {
+    int x_cpy = x;
+    std::string ans = "0000000000000000";    // 16 bitów
+    std::string ans_backwards = "";
 
-            // storing remainder in binary array
-            binaryNum[i] = n % 2;
-            n = n / 2;
-            i++;
-        }
+    while(x_cpy != 0){
+        if(x_cpy%2 == 1)
+            ans_backwards = ans_backwards + "1";
+        else if(x_cpy%2 == 0)
+            ans_backwards = ans_backwards + "0";
+        else
+            std::cout << "error -> modulo z 2 inne niż 1 lub 0";
+        x_cpy = x_cpy/2;
+    }
 
-        int binary=0;
-        // printing binary array in reverse order
-        for (int j = i - 1; j >= 0; j--)
-            //std::cout << binaryNum[j];
+    for(int i = ans_backwards.length(); i>=0; i--){
+        // std::cout << ans_backwards[i];
+    }
 
-        for (int j = i - 1; j >= 0; j--)
-            binary += binaryNum[j]*pow(10, j);
+    int k = 0;
+    for(int i = ans.length()-1; i >= (ans.length() - ans_backwards.length()); i--){
+        ans[i] = ans_backwards[k];
+        k++;
+    }
 
-        char* result;
-        itoa(binary, result, 10);
-
-        return result;
+    return ans;
 }
+
+
 
 // =============================================    RADIOBUTTONS CLICKED
 // ------------------------------------------------------------------ A 1
@@ -664,7 +668,10 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
 }
 
 void MainWindow::on_perform_order_button_clicked(){
+
+    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
     int order = ui->combo_box_order->currentIndex();
+
     if(order == MOV){   // ================================= PRZENOSZENIE
         std::string from_h, from_l;
         if(ui->combo_box_one->currentText() == "A"){
@@ -813,7 +820,79 @@ void MainWindow::on_perform_order_button_clicked(){
         }else{
             ui->combo_box_three->setCurrentText("ERROR");
         }
-    }else{  // ============================ ODEJMOWANIE
+    }else if(order == SUB){  // ===================================================== ODEJMOWANIE
+        std::string first, second, answer;
+        if(ui->combo_box_one->currentText() == "A"){
+            first = register_ah + register_al;
+        }else if(ui->combo_box_one->currentText() == "B"){
+            first = register_bh + register_bl;
+        }else if(ui->combo_box_one->currentText() == "C"){
+            first = register_ch + register_cl;
+        }else if(ui->combo_box_one->currentText() == "D"){
+            first = register_dh + register_dl;
+        }else{
+            ui->combo_box_one->setCurrentText("ERROR");
+        }
+        if(ui->combo_box_two->currentText() == "A"){
+            second = register_ah + register_al;
+        }else if(ui->combo_box_two->currentText() == "B"){
+            second = register_bh + register_bl;
+        }else if(ui->combo_box_two->currentText() == "C"){
+            second = register_ch + register_cl;
+        }else if(ui->combo_box_two->currentText() == "D"){
+            second = register_dh + register_dl;
+        }else{
+            ui->combo_box_two->setCurrentText("ERROR");
+        }
 
+        if(ui->combo_box_three->currentText() == "A"){
+            // std::cout << "\n\nfirst: " << first;
+            // std::cout << "\nsecond: " << first;
+
+            // int binary_to_int(std::string input)
+            int first_int = binary_to_int(first);
+            int second_int = binary_to_int(second);
+            // std::cout << "\nfirst_int: " << first_int;
+            // std::cout << "\nsecond_int: " << second_int;
+
+            if(first_int < second_int){
+                ui->label_result_less_than_zero->setGeometry(680, 330, 121, 71);
+            }
+
+            // odejmowanie intów
+            int answer_int = first_int - second_int;
+            // std::cout << "\nanswer_int: " << answer_int;
+
+            answer = decimal_to_binary(answer_int);
+            register_ah = "";
+            register_al = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ah = register_ah + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_al = register_al + answer[i];
+            }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ah = register_ah + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_al = register_al + answer[i];
+            }else{
+                register_ah = "ERROR";
+                register_al = "ERROR";
+            }
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+        }else if(ui->combo_box_three->currentText() == "B"){
+
+        }else if(ui->combo_box_three->currentText() == "C"){
+
+        }else if(ui->combo_box_three->currentText() == "D"){
+
+        }else{
+            ui->combo_box_three->setCurrentText("ERROR");
+        }
+
+    }else{
+        ui->combo_box_order->setCurrentText("ERROR");
     }
 }
