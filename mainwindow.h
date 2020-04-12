@@ -34,6 +34,9 @@ public:
     std::string register_dh = "00000000";
     std::string register_dl = "00000000";
 
+    std::string input_h = "00000000";
+    std::string input_l = "00000000";
+
     // std::string addBinary(std::string a, std::string b);
     // int binary_to_int(std::string x);
     // std::string decimal_to_binary(int n);
@@ -187,6 +190,41 @@ private slots:
     void on_combo_box_order_currentIndexChanged(int index);
 
     void on_perform_order_button_clicked();
+
+    void on_radioButton_in1_15_clicked();
+    void on_radioButton_in1_14_clicked();
+    void on_radioButton_in1_13_clicked();
+    void on_radioButton_in1_12_clicked();
+    void on_radioButton_in1_11_clicked();
+    void on_radioButton_in1_10_clicked();
+    void on_radioButton_in1_9_clicked();
+    void on_radioButton_in1_8_clicked();
+    void on_radioButton_in1_7_clicked();
+    void on_radioButton_in1_6_clicked();
+    void on_radioButton_in1_5_clicked();
+    void on_radioButton_in1_4_clicked();
+    void on_radioButton_in1_3_clicked();
+    void on_radioButton_in1_2_clicked();
+    void on_radioButton_in1_1_clicked();
+    void on_radioButton_in1_0_clicked();
+    void on_radioButton_in0_15_clicked();
+    void on_radioButton_in0_14_clicked();
+    void on_radioButton_in0_13_clicked();
+    void on_radioButton_in0_12_clicked();
+    void on_radioButton_in0_11_clicked();
+    void on_radioButton_in0_10_clicked();
+    void on_radioButton_in0_9_clicked();
+    void on_radioButton_in0_8_clicked();
+    void on_radioButton_in0_7_clicked();
+    void on_radioButton_in0_6_clicked();
+    void on_radioButton_in0_5_clicked();
+    void on_radioButton_in0_4_clicked();
+    void on_radioButton_in0_3_clicked();
+    void on_radioButton_in0_2_clicked();
+    void on_radioButton_in0_1_clicked();
+    void on_radioButton_in0_0_clicked();
+
+    void on_combo_box_two_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
