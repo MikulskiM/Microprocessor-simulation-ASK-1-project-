@@ -773,7 +773,7 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
     ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
     ui->label_order_limit_reached->setGeometry(480, 590, 281, 1);
 
-    if(ui->combo_box_order->currentText() == SUB){
+    if(ui->combo_box_order->currentText() == "SUB"){
         ui->label_one->setText("-");
         ui->label_two->setEnabled(true);
         ui->label_two->setText("=>");
@@ -782,7 +782,7 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
             ui->label_two->setEnabled(false);
             ui->combo_box_three->setEnabled(false);
         }
-    }else if(ui->combo_box_order->currentText() == ADD){
+    }else if(ui->combo_box_order->currentText() == "ADD"){
         ui->label_one->setText("+");
         ui->label_two->setEnabled(true);
         ui->label_two->setText("=>");
@@ -818,7 +818,8 @@ void MainWindow::on_combo_box_two_currentIndexChanged(int index)
 
     if(ui->combo_box_two->currentText() == "INPUT" && ui->combo_box_order->currentText() == "MOV"){
         ui->label_one->setText("<=");
-    }
+    }else if(ui->combo_box_two->currentText() != "INPUT" && ui->combo_box_order->currentText() == "MOV")
+        ui->label_one->setText("=>");
     if(ui->combo_box_two->currentText() == "INPUT"){
         ui->label_two->setEnabled(false);
         ui->combo_box_three->setEnabled(false);
