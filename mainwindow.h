@@ -2,6 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "order.h"
+
+
+#define NUMBER_OF_ORDERS_IN_PROGRAM 8   // maxymalna liczba rozkazów przypadająca na pojedynczy program
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,9 +42,8 @@ public:
     std::string input_h = "00000000";
     std::string input_l = "00000000";
 
-    // std::string addBinary(std::string a, std::string b);
-    // int binary_to_int(std::string x);
-    // std::string decimal_to_binary(int n);
+    int how_many_orders = 0;
+    Order program[NUMBER_OF_ORDERS_IN_PROGRAM];
 
     // ----
 
@@ -225,6 +229,8 @@ private slots:
     void on_radioButton_in0_0_clicked();
 
     void on_combo_box_two_currentIndexChanged(int index);
+
+    void on_save_order_button_clicked();
 
 private:
     Ui::MainWindow *ui;

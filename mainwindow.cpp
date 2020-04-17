@@ -4,10 +4,6 @@
 #include <cmath>
 #include <iostream>
 
-#define MOV 0
-#define ADD 1
-#define SUB 2
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -773,8 +769,11 @@ void MainWindow::on_radioButton_in0_0_clicked(){
 
 void MainWindow::on_combo_box_order_currentIndexChanged(int index)
 {
-    int chosen_order = ui->combo_box_order->currentIndex();
-    if(chosen_order == SUB){
+    // ----------- resetowanie komunikatów błedów
+    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
+    ui->label_order_limit_reached->setGeometry(480, 590, 281, 1);
+
+    if(ui->combo_box_order->currentText() == SUB){
         ui->label_one->setText("-");
         ui->label_two->setEnabled(true);
         ui->label_two->setText("=>");
@@ -783,7 +782,7 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
             ui->label_two->setEnabled(false);
             ui->combo_box_three->setEnabled(false);
         }
-    }else if(chosen_order == ADD){
+    }else if(ui->combo_box_order->currentText() == ADD){
         ui->label_one->setText("+");
         ui->label_two->setEnabled(true);
         ui->label_two->setText("=>");
@@ -813,13 +812,14 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
 
 void MainWindow::on_combo_box_two_currentIndexChanged(int index)
 {
-    int chosen_order = ui->combo_box_order->currentIndex();
-    int argument = ui->combo_box_two->currentIndex();
-    int INPUT = 4;
-    if(argument == INPUT && chosen_order == MOV){
+    // ----------- resetowanie komunikatów błedów
+    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
+    ui->label_order_limit_reached->setGeometry(480, 590, 281, 1);
+
+    if(ui->combo_box_two->currentText() == "INPUT" && ui->combo_box_order->currentText() == "MOV"){
         ui->label_one->setText("<=");
     }
-    if(argument == INPUT){
+    if(ui->combo_box_two->currentText() == "INPUT"){
         ui->label_two->setEnabled(false);
         ui->combo_box_three->setEnabled(false);
     }
@@ -829,9 +829,9 @@ void MainWindow::on_combo_box_two_currentIndexChanged(int index)
 void MainWindow::on_perform_order_button_clicked(){
 
     ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
-    int order = ui->combo_box_order->currentIndex();
+    ui->label_order_limit_reached->setGeometry(480, 590, 281, 1);
 
-    if(order == MOV){   // ================================= PRZENOSZENIE
+    if(ui->combo_box_order->currentText() == "MOV"){   // ================================= PRZENOSZENIE
         std::string from_h, from_l;
         if(ui->combo_box_one->currentText() == "A"){
             from_h = register_ah;
@@ -896,7 +896,7 @@ void MainWindow::on_perform_order_button_clicked(){
             ui->combo_box_two->setCurrentText("ERROR");
         }
 
-    }else if(order == ADD){ // =========================== DODAWANIE
+    }else if(ui->combo_box_order->currentText() == "ADD"){ // =========================== DODAWANIE
         std::string first, second, answer;
         if(ui->combo_box_one->currentText() == "A"){
             first = register_ah + register_al;
@@ -1093,7 +1093,7 @@ void MainWindow::on_perform_order_button_clicked(){
             }
         }
 
-    }else if(order == SUB){  // ===================================================== ODEJMOWANIE
+    }else if(ui->combo_box_order->currentText() == "SUB"){  // ===================================================== ODEJMOWANIE
         std::string first, second, answer;
         if(ui->combo_box_one->currentText() == "A"){
             first = register_ah + register_al;
@@ -1360,3 +1360,159 @@ void MainWindow::on_perform_order_button_clicked(){
     }
 }
 
+
+void MainWindow::on_save_order_button_clicked()
+{
+    how_many_orders++;
+    if(how_many_orders > NUMBER_OF_ORDERS_IN_PROGRAM){
+        ui->label_order_limit_reached->setGeometry(480, 590, 281, 21);
+
+    }else{
+        // ----------- resetowanie komunikatów błedów
+        ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
+        ui->label_order_limit_reached->setGeometry(480, 590, 281, 1);
+
+        // ------------- zapisywanie ordera do tablicy orderów (programu)
+        if(ui->combo_box_order->currentText() == "MOV")
+            program[how_many_orders-1].order = MOV;
+        else if(ui->combo_box_order->currentText() == "ADD")
+            program[how_many_orders-1].order = ADD;
+        else if(ui->combo_box_order->currentText() == "SUB")
+            program[how_many_orders-1].order = SUB;
+
+        if(ui->combo_box_two->currentText() == "INPUT"){    // tryb natychmiastowy adresowania
+
+            program[how_many_orders-1].second = input_h + input_l;
+
+            if(ui->combo_box_one->currentText() == "A"){
+
+                program[how_many_orders-1].first = "A";
+                program[how_many_orders-1].third = "_";
+                /*
+                program[how_many_orders-1].first = register_ah + register_al;
+                program[how_many_orders-1].third = "_";
+                */
+            }
+            else if(ui->combo_box_one->currentText() == "B"){
+
+                program[how_many_orders-1].first = "B";
+                program[how_many_orders-1].third = "_";
+            }
+            else if(ui->combo_box_one->currentText() == "C"){
+
+                program[how_many_orders-1].first = "C";
+                program[how_many_orders-1].third = "_";
+            }
+            else if(ui->combo_box_one->currentText() == "D"){
+
+                program[how_many_orders-1].first = "D";
+                program[how_many_orders-1].third = "_";
+            }
+
+        }else{ // -------------------------------------------- tryb rejestrowy adresowania
+
+            if(ui->combo_box_one->currentText() == "A"){
+
+                program[how_many_orders-1].first = "A";
+                // program[how_many_orders-1].first = register_ah + register_al;
+            }
+            else if(ui->combo_box_one->currentText() == "B"){
+                program[how_many_orders-1].first = "B";
+            }
+            else if(ui->combo_box_one->currentText() == "C"){
+                program[how_many_orders-1].first = "C";
+            }
+            else if(ui->combo_box_one->currentText() == "D"){
+                program[how_many_orders-1].first = "D";
+            }
+
+            if(ui->combo_box_two->currentText() == "A"){
+                program[how_many_orders-1].second = "A";
+            }
+            else if(ui->combo_box_two->currentText() == "B"){
+                program[how_many_orders-1].second = "B";
+            }
+            else if(ui->combo_box_two->currentText() == "C"){
+                program[how_many_orders-1].second = "C";
+            }
+            else if(ui->combo_box_three->currentText() == "D"){
+                program[how_many_orders-1].second = "D";
+            }
+
+            if(ui->combo_box_three->currentText() == "A"){
+                program[how_many_orders-1].third = "A";
+            }
+            else if(ui->combo_box_three->currentText() == "B"){
+                program[how_many_orders-1].third = "B";
+            }
+            else if(ui->combo_box_three->currentText() == "C"){
+                program[how_many_orders-1].third = "C";
+            }
+            else if(ui->combo_box_three->currentText() == "D"){
+                program[how_many_orders-1].third = "D";
+            }
+
+        }
+        // ----------- przerabianie tablicy programu z rozkazami na string do wyświetlenia
+        std::string program_str = "";
+        for(int i = 0; i < how_many_orders; i++){
+            if(program[i].order == ADD)
+                program_str += "ADD";
+            else if(program[i].order == SUB)
+                program_str += "SUB";
+            else if(program[i].order == MOV)
+                program_str += "MOV";
+            else
+                program_str += "???";
+            program_str += " ";
+
+
+            if(program[i].first == "A")
+                program_str += "A";
+            else if(program[i].first == "B")
+                program_str += "B";
+            else if(program[i].first == "C")
+                program_str += "C";
+            else if(program[i].first == "D")
+                program_str += "D";
+            else
+                program_str += "?";
+            program_str += " ";
+
+
+            if(program[i].second == "A")
+                program_str += "A";
+            else if(program[i].second == "B")
+                program_str += "B";
+            else if(program[i].second == "C")
+                program_str += "C";
+            else if(program[i].second == "D")
+                program_str += "D";
+            else if(program[i].second == "INPUT")
+                program_str += input_h + input_l;
+            else
+                program_str += "?";
+            program_str += " ";
+
+
+            if(program[i].second == "INPUT"){
+                program_str += "_";
+            }else{
+                if(program[i].second == "A")
+                    program_str += "A";
+                else if(program[i].second == "B")
+                    program_str += "B";
+                else if(program[i].second == "C")
+                    program_str += "C";
+                else if(program[i].second == "D")
+                    program_str += "D";
+                else
+                    program_str += "?";
+            }
+            program_str += "\n";
+        }
+
+        // ----------- wyświetlanie aktualnych orderów (programu) w labelu po prawej
+        ui->label_program->setText(QString::fromStdString(program_str));
+    }
+}

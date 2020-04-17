@@ -21,7 +21,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    math.h
+    order.h
 
 FORMS += \
     mainwindow.ui

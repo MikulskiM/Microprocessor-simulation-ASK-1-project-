@@ -5433,6 +5433,22 @@ MOV A 110</string>
      <string>PROGRAM</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_order_limit_reached">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>590</y>
+      <width>281</width>
+      <height>1</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;limit rozkazów w programie został wyczerpany&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
