@@ -824,6 +824,10 @@ void MainWindow::on_combo_box_two_currentIndexChanged(int index)
         ui->label_two->setEnabled(false);
         ui->combo_box_three->setEnabled(false);
     }
+    if(ui->combo_box_two->currentText() != "INPUT" && ui->combo_box_order->currentText() != "MOV"){ // gdy np. ADD, przy zmianie z INPUT na np. C rejestr wynikowy nie robił się enable
+        ui->label_two->setEnabled(true);
+        ui->combo_box_three->setEnabled(true);
+    }
 }
 
 
@@ -1384,6 +1388,7 @@ void MainWindow::on_save_order_button_clicked()
         if(ui->combo_box_two->currentText() == "INPUT"){    // tryb natychmiastowy adresowania
 
             program[how_many_orders-1].second = input_h + input_l;
+            std::cout << "program[" << how_many_orders-1 << "].second = (input) " << input_h << input_l << "\n";
 
             if(ui->combo_box_one->currentText() == "A"){
 
@@ -1489,27 +1494,27 @@ void MainWindow::on_save_order_button_clicked()
                 program_str += "C";
             else if(program[i].second == "D")
                 program_str += "D";
-            else if(program[i].second == "INPUT")
-                program_str += input_h + input_l;
-            else
-                program_str += "?";
+//            else if(program[i].second == "INPUT"){
+//                std::string input = input_h + input_l;
+//                program_str += input;
+//            }
+            else    // INPUT - program[i].second nigdy nie będzie = "INPUT" bo program[i].second = np. "0010000100101100"
+                program_str += program[i].second;
             program_str += " ";
 
 
-            if(program[i].second == "INPUT"){
+
+            if(program[i].third == "A")
+                program_str += "A";
+            else if(program[i].third == "B")
+                program_str += "B";
+            else if(program[i].third == "C")
+                program_str += "C";
+            else if(program[i].third == "D")
+                program_str += "D";
+            else
                 program_str += "_";
-            }else{
-                if(program[i].second == "A")
-                    program_str += "A";
-                else if(program[i].second == "B")
-                    program_str += "B";
-                else if(program[i].second == "C")
-                    program_str += "C";
-                else if(program[i].second == "D")
-                    program_str += "D";
-                else
-                    program_str += "?";
-            }
+
             program_str += "\n";
         }
 

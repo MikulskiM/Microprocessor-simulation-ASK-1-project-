@@ -5388,7 +5388,7 @@ program</string>
      <rect>
       <x>900</x>
       <y>210</y>
-      <width>261</width>
+      <width>271</width>
       <height>311</height>
      </rect>
     </property>
@@ -5404,9 +5404,7 @@ program</string>
      <enum>Qt::LeftToRight</enum>
     </property>
     <property name="text">
-     <string>ADD A B C
-SUB A 101
-MOV A 110</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ADD A B C&lt;/p&gt;&lt;p&gt;SUB A 101&lt;/p&gt;&lt;p&gt;MOV A 110&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;MOV A 0010000100101100 _&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
