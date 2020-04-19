@@ -45,6 +45,8 @@ public:
     int how_many_orders = 0;
     Order program[NUMBER_OF_ORDERS_IN_PROGRAM];
 
+    std::string program_str = "";
+
     // ----
 
 private slots:
@@ -231,6 +233,12 @@ private slots:
     void on_combo_box_two_currentIndexChanged(int index);
 
     void on_save_order_button_clicked();
+
+    void on_save_program_button_clicked();
+
+    void on_load_program_button_clicked();
+
+    void display_program();
 
 private:
     Ui::MainWindow *ui;

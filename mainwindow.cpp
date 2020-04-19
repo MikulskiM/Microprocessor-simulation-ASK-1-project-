@@ -3,6 +3,9 @@
 
 #include <cmath>
 #include <iostream>
+#include <QFile>        // do zapisywania w pliku   |
+#include <QTextStream>  // do zapisywania w pliku   |
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -1366,6 +1369,71 @@ void MainWindow::on_perform_order_button_clicked(){
 }
 
 
+void MainWindow::display_program(){
+    // ----------- przerabianie tablicy programu z rozkazami na string do wyświetlenia
+    program_str = "";
+    for(int i = 0; i < how_many_orders; i++){
+        if(program[i].order == ADD)
+            program_str += "ADD";
+        else if(program[i].order == SUB)
+            program_str += "SUB";
+        else if(program[i].order == MOV)
+            program_str += "MOV";
+        else
+            program_str += "???";
+        program_str += " ";
+
+
+        if(program[i].first == "A")
+            program_str += "A";
+        else if(program[i].first == "B")
+            program_str += "B";
+        else if(program[i].first == "C")
+            program_str += "C";
+        else if(program[i].first == "D")
+            program_str += "D";
+        else
+            program_str += "?";
+        program_str += " ";
+
+
+        if(program[i].second == "A")
+            program_str += "A";
+        else if(program[i].second == "B")
+            program_str += "B";
+        else if(program[i].second == "C")
+            program_str += "C";
+        else if(program[i].second == "D")
+            program_str += "D";
+//            else if(program[i].second == "INPUT"){
+//                std::string input = input_h + input_l;
+//                program_str += input;
+//            }
+        else    // INPUT - program[i].second nigdy nie będzie = "INPUT" bo program[i].second = np. "0010000100101100"
+            program_str += program[i].second;
+        program_str += " ";
+
+
+
+        if(program[i].third == "A")
+            program_str += "A";
+        else if(program[i].third == "B")
+            program_str += "B";
+        else if(program[i].third == "C")
+            program_str += "C";
+        else if(program[i].third == "D")
+            program_str += "D";
+        else
+            program_str += "_";
+
+        program_str += "\n";
+    }
+
+    // ----------- wyświetlanie aktualnych orderów (programu) w labelu po prawej
+    ui->label_program->setText(QString::fromStdString(program_str));
+}
+
+
 void MainWindow::on_save_order_button_clicked()
 {
     how_many_orders++;
@@ -1441,84 +1509,99 @@ void MainWindow::on_save_order_button_clicked()
             else if(ui->combo_box_two->currentText() == "C"){
                 program[how_many_orders-1].second = "C";
             }
-            else if(ui->combo_box_three->currentText() == "D"){
+            else if(ui->combo_box_two->currentText() == "D"){
                 program[how_many_orders-1].second = "D";
             }
 
-            if(ui->combo_box_three->currentText() == "A"){
-                program[how_many_orders-1].third = "A";
+            if(ui->combo_box_order->currentText() == "MOV")
+                program[how_many_orders-1].third = "_";
+            else{
+                if(ui->combo_box_three->currentText() == "A"){
+                    program[how_many_orders-1].third = "A";
+                }
+                else if(ui->combo_box_three->currentText() == "B"){
+                    program[how_many_orders-1].third = "B";
+                }
+                else if(ui->combo_box_three->currentText() == "C"){
+                    program[how_many_orders-1].third = "C";
+                }
+                else if(ui->combo_box_three->currentText() == "D"){
+                    program[how_many_orders-1].third = "D";
+                }
             }
-            else if(ui->combo_box_three->currentText() == "B"){
-                program[how_many_orders-1].third = "B";
-            }
-            else if(ui->combo_box_three->currentText() == "C"){
-                program[how_many_orders-1].third = "C";
-            }
-            else if(ui->combo_box_three->currentText() == "D"){
-                program[how_many_orders-1].third = "D";
-            }
-
         }
-        // ----------- przerabianie tablicy programu z rozkazami na string do wyświetlenia
-        std::string program_str = "";
-        for(int i = 0; i < how_many_orders; i++){
-            if(program[i].order == ADD)
-                program_str += "ADD";
-            else if(program[i].order == SUB)
-                program_str += "SUB";
-            else if(program[i].order == MOV)
-                program_str += "MOV";
-            else
-                program_str += "???";
-            program_str += " ";
-
-
-            if(program[i].first == "A")
-                program_str += "A";
-            else if(program[i].first == "B")
-                program_str += "B";
-            else if(program[i].first == "C")
-                program_str += "C";
-            else if(program[i].first == "D")
-                program_str += "D";
-            else
-                program_str += "?";
-            program_str += " ";
-
-
-            if(program[i].second == "A")
-                program_str += "A";
-            else if(program[i].second == "B")
-                program_str += "B";
-            else if(program[i].second == "C")
-                program_str += "C";
-            else if(program[i].second == "D")
-                program_str += "D";
-//            else if(program[i].second == "INPUT"){
-//                std::string input = input_h + input_l;
-//                program_str += input;
-//            }
-            else    // INPUT - program[i].second nigdy nie będzie = "INPUT" bo program[i].second = np. "0010000100101100"
-                program_str += program[i].second;
-            program_str += " ";
-
-
-
-            if(program[i].third == "A")
-                program_str += "A";
-            else if(program[i].third == "B")
-                program_str += "B";
-            else if(program[i].third == "C")
-                program_str += "C";
-            else if(program[i].third == "D")
-                program_str += "D";
-            else
-                program_str += "_";
-
-            program_str += "\n";
-        }
-
-        // ----------- wyświetlanie aktualnych orderów (programu) w labelu po prawej
-        ui->label_program->setText(QString::fromStdString(program_str));
+        // ----------- wyś◘wietlam aktualny program
+        display_program();
     }
+}
+
+void MainWindow::on_save_program_button_clicked()
+{
+    QString filename = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\my_program.txt";
+    QFile file(filename);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << QString::fromStdString(program_str) << endl;
+    }
+    file.close();
+}
+
+void MainWindow::on_load_program_button_clicked()
+{
+    QString filename = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\my_program.txt";
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0, "error", file.errorString());
+    }
+
+    QTextStream in(&file);
+
+    ui->label_program->setText("");
+    how_many_orders = 0;
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+        std::string line_str = line.toStdString();
+
+        if(line_str.substr(0,3) == "MOV")
+            program[how_many_orders].order = MOV;
+        else if(line_str.substr(0,3) == "ADD")
+            program[how_many_orders].order = ADD;
+        else if(line_str.substr(0,3) == "SUB")
+            program[how_many_orders].order = SUB;
+
+        if(line_str[4] == 'A')
+            program[how_many_orders].first = "A";
+        else if(line_str[4] == 'B')
+            program[how_many_orders].first = "B";
+        else if(line_str[4] == 'C')
+            program[how_many_orders].first = "C";
+        else if(line_str[4] == 'D')
+            program[how_many_orders].first = "D";
+
+        if(line_str[6] == '0' || line_str[6] == '1'){
+            program[how_many_orders].second = line_str.substr(6,16);
+            program[how_many_orders].third = "_";
+        }else{
+            program[how_many_orders].second = line_str[6];
+            program[how_many_orders].third = line_str[8];
+        }
+
+/*
+        if(line_str.substr(6,1) == "0" || line_str.substr(6,1) == "1"){
+            program[how_many_orders].second = line_str.substr(6,16);
+            program[how_many_orders].third = "_";
+        }else{
+            program[how_many_orders].second = line_str.substr(6,1);
+            program[how_many_orders].third = line_str.substr(8,1);
+        }
+*/
+        how_many_orders++;
+    }
+    how_many_orders--;
+
+    // ----------- wyś◘wietlam aktualny program
+    display_program();
+
+    file.close();
 }
