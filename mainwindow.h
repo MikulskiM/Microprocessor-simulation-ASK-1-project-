@@ -47,6 +47,8 @@ public:
 
     std::string program_str = "";
 
+    int order_number = 0;
+
     // ----
 
 private slots:
@@ -239,6 +241,10 @@ private slots:
     void on_load_program_button_clicked();
 
     void display_program();
+
+    void display_order_numbers(int numer_aktualnego_rozkazu);
+
+    void on_perform_step_button_clicked();
 
 private:
     Ui::MainWindow *ui;

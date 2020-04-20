@@ -1434,12 +1434,28 @@ void MainWindow::display_program(){
 }
 
 
+void MainWindow::display_order_numbers(int numer_aktualnego_rozkazu = -1){
+    // --------------------------------- wypisywanie numerów rozkazów w programie
+    std::string numerki = "";
+    for(int i = 0; i<how_many_orders; i++){
+        if(i == numer_aktualnego_rozkazu){
+            numerki += "=" + std::to_string(i) + "=";
+        }else{
+            numerki += std::to_string(i);
+        }
+        numerki += "\n";
+    }
+    // -------------------------------- wyświetlanie
+    ui->label_program_number->setText(QString::fromStdString(numerki));
+}
+
+
 void MainWindow::on_save_order_button_clicked()
 {
     how_many_orders++;
     if(how_many_orders > NUMBER_OF_ORDERS_IN_PROGRAM){
         ui->label_order_limit_reached->setGeometry(480, 590, 281, 21);
-
+        how_many_orders--;
     }else{
         // ----------- resetowanie komunikatów błedów
         ui->label_result_less_than_zero->setGeometry(680, 330, 121, 1);
@@ -1532,6 +1548,7 @@ void MainWindow::on_save_order_button_clicked()
         }
         // ----------- wyś◘wietlam aktualny program
         display_program();
+        display_order_numbers();
     }
 }
 
@@ -1587,21 +1604,96 @@ void MainWindow::on_load_program_button_clicked()
             program[how_many_orders].third = line_str[8];
         }
 
-/*
-        if(line_str.substr(6,1) == "0" || line_str.substr(6,1) == "1"){
-            program[how_many_orders].second = line_str.substr(6,16);
-            program[how_many_orders].third = "_";
-        }else{
-            program[how_many_orders].second = line_str.substr(6,1);
-            program[how_many_orders].third = line_str.substr(8,1);
-        }
-*/
+
+        std::cout << line_str << "\n";
+
+
         how_many_orders++;
     }
     how_many_orders--;
 
     // ----------- wyś◘wietlam aktualny program
     display_program();
-
+    display_order_numbers();
+    //how_many_orders--;
     file.close();
+}
+
+void MainWindow::on_perform_step_button_clicked()
+{
+    display_order_numbers(order_number);
+
+    if(program[order_number].order == MOV){
+        std::string from_h, from_l;
+
+        if(program[order_number].first == "A"){
+            from_h = register_ah;
+            from_l = register_al;
+        }else if(program[order_number].first == "B"){
+            from_h = register_bh;
+            from_l = register_bl;
+        }else if(program[order_number].first == "C"){
+            from_h = register_ch;
+            from_l = register_cl;
+        }else if(program[order_number].first == "D"){
+            from_h = register_dh;
+            from_l = register_dl;
+        }
+
+        if(program[order_number].second == "A"){
+            register_ah = from_h;
+            register_al = from_l;
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+        }else if(program[order_number].second == "B"){
+            register_bh = from_h;
+            register_bl = from_l;
+            ui->b_register_l->setText(QString::fromStdString(register_bl));
+            ui->b_register_h->setText(QString::fromStdString(register_bh));
+        }else if(program[order_number].second == "C"){
+            register_ch = from_h;
+            register_cl = from_l;
+            ui->c_register_l->setText(QString::fromStdString(register_cl));
+            ui->c_register_h->setText(QString::fromStdString(register_ch));
+        }else if(program[order_number].second == "D"){
+            register_dh = from_h;
+            register_dl = from_l;
+            ui->d_register_l->setText(QString::fromStdString(register_dl));
+            ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+        }else{  // INPUT (np. 1000111100001010)
+            if(program[order_number].first == "A"){
+                register_ah = program[order_number].second.substr(0,8);
+                register_al = program[order_number].second.substr(8,8);
+                ui->a_register_l->setText(QString::fromStdString(register_al));
+                ui->a_register_h->setText(QString::fromStdString(register_ah));
+            }else if(program[order_number].first == "B"){
+                register_bh = program[order_number].second.substr(0,8);
+                register_bl = program[order_number].second.substr(8,8);
+                ui->b_register_l->setText(QString::fromStdString(register_bl));
+                ui->b_register_h->setText(QString::fromStdString(register_bh));
+            }else if(program[order_number].first == "C"){
+                register_ch = program[order_number].second.substr(0,8);
+                register_cl = program[order_number].second.substr(8,8);
+                ui->c_register_l->setText(QString::fromStdString(register_cl));
+                ui->c_register_h->setText(QString::fromStdString(register_ch));
+            }else if(program[order_number].first == "D"){
+                register_dh = program[order_number].second.substr(0,8);
+                register_dl = program[order_number].second.substr(8,8);
+                ui->d_register_l->setText(QString::fromStdString(register_dl));
+                ui->d_register_h->setText(QString::fromStdString(register_dh));
+            }
+        }
+    }else if(program[order_number].order == ADD){
+        // TODO:
+    }else if(program[order_number].order == SUB){
+
+    }else{
+        //ui->label_program->setText("ERROR: nieudane rozpoznanie\nrozkazu przy on_perform_step_button_clicked()");
+    }
+
+    order_number++;
+    if(order_number>how_many_orders)
+        order_number = 0;
+
 }
