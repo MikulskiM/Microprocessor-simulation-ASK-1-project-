@@ -2148,9 +2148,10 @@ void MainWindow::on_perform_step_button_clicked()
 }
 
 void MainWindow::on_perform_program_button_clicked(){    // wykonaj cały program
-    for(int i = 0; order_number <= how_many_orders; i++){
+    order_number = 0;
+    for(int i = 0; i <= how_many_orders; i++){
+
         on_perform_step_button_clicked();
-        QThread::msleep(1000);
-        // Sleep();
+
     }
 }
