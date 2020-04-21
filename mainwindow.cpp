@@ -6,6 +6,7 @@
 #include <QFile>        // do zapisywania w pliku   |
 #include <QTextStream>  // do zapisywania w pliku   |
 #include <QMessageBox>
+#include <QThread>      // delay in performing whole program
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -1623,7 +1624,7 @@ void MainWindow::on_perform_step_button_clicked()
 {
     display_order_numbers(order_number);
 
-    if(program[order_number].order == MOV){
+    if(program[order_number].order == MOV){ // --------------------------------- MOV
         std::string from_h, from_l;
 
         if(program[order_number].first == "A"){
@@ -1684,9 +1685,457 @@ void MainWindow::on_perform_step_button_clicked()
                 ui->d_register_h->setText(QString::fromStdString(register_dh));
             }
         }
-    }else if(program[order_number].order == ADD){
-        // TODO:
-    }else if(program[order_number].order == SUB){
+    }else if(program[order_number].order == ADD){// --------------------------------- ADD
+
+        std::string first, second, answer;
+
+        if(program[order_number].first == "A"){
+            first = register_ah + register_al;
+        }else if(program[order_number].first == "B"){
+            first = register_bh + register_bl;
+        }else if(program[order_number].first == "C"){
+            first = register_ch + register_cl;
+        }else if(program[order_number].first == "D"){
+            first = register_dh + register_dl;
+        }
+
+        if(program[order_number].second == "A"){
+            second = register_ah + register_al;
+        }else if(program[order_number].second == "B"){
+            second = register_bh + register_bl;
+        }else if(program[order_number].second == "C"){
+            second = register_ch + register_cl;
+        }else if(program[order_number].second == "D"){
+            second = register_dh + register_dl;
+        }else{                                      // =============== INPUT - tryb adresowania natychmiastowego
+
+            second = program[order_number].second;
+            answer = addBinary(first, second);
+
+            if(program[order_number].first == "A"){
+                register_ah = "";
+                register_al = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_ah = register_ah + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_al = register_al + answer[i];
+                }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_ah = register_ah + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_al = register_al + answer[i];
+                }else{
+                    register_ah = "ERROR";
+                    register_al = "ERROR";
+                }
+                ui->a_register_l->setText(QString::fromStdString(register_al));
+                ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+            }else if(program[order_number].first == "B"){
+                register_bh = "";
+                register_bl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_bh = register_bh + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_bl = register_bl + answer[i];
+                }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_bh = register_bh + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_bl = register_bl + answer[i];
+                }else{
+                    register_bh = "ERROR";
+                    register_bl = "ERROR";
+                }
+                ui->b_register_l->setText(QString::fromStdString(register_bl));
+                ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+            }else if(program[order_number].first == "C"){
+                register_ch = "";
+                register_cl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_ch = register_ch + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_cl = register_cl + answer[i];
+                }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_ch = register_ch + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_cl = register_cl + answer[i];
+                }else{
+                    register_ch = "ERROR";
+                    register_cl = "ERROR";
+                }
+                ui->c_register_l->setText(QString::fromStdString(register_cl));
+                ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+            }else if(program[order_number].first == "D"){
+
+                register_dh = "";
+                register_dl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_dh = register_dh + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_dl = register_dl + answer[i];
+                }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_dh = register_dh + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_dl = register_dl + answer[i];
+                }else{
+                    register_dh = "ERROR";
+                    register_dl = "ERROR";
+                }
+                ui->d_register_l->setText(QString::fromStdString(register_dl));
+                ui->d_register_h->setText(QString::fromStdString(register_dh));
+            }
+        }
+
+        answer = addBinary(first, second);
+        if(program[order_number].third == "A"){
+            register_ah = "";
+            register_al = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ah = register_ah + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_al = register_al + answer[i];
+            }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ah = register_ah + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_al = register_al + answer[i];
+            }else{
+                register_ah = "ERROR";
+                register_al = "ERROR";
+            }
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+        }else if(program[order_number].third == "B"){
+            register_bh = "";
+            register_bl = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_bh = register_bh + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_bl = register_bl + answer[i];
+            }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_bh = register_bh + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_bl = register_bl + answer[i];
+            }else{
+                register_bh = "ERROR";
+                register_bl = "ERROR";
+            }
+            ui->b_register_l->setText(QString::fromStdString(register_bl));
+            ui->b_register_h->setText(QString::fromStdString(register_bh));
+        }else if(program[order_number].third == "C"){
+            register_ch = "";
+            register_cl = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ch = register_ch + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_cl = register_cl + answer[i];
+            }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ch = register_ch + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_cl = register_cl + answer[i];
+            }else{
+                register_ch = "ERROR";
+                register_cl = "ERROR";
+            }
+            ui->c_register_l->setText(QString::fromStdString(register_cl));
+            ui->c_register_h->setText(QString::fromStdString(register_ch));
+        }else if(program[order_number].third == "D"){
+            register_dh = "";
+            register_dl = "";
+            if(answer.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_dh = register_dh + answer[i];
+                for(int i = 8; i < 16; i++)
+                    register_dl = register_dl + answer[i];
+            }else if(answer.size() == 17){  // w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_dh = register_dh + answer[i];
+                for(int i = 9; i < 17; i++)
+                    register_dl = register_dl + answer[i];
+            }else{
+                register_dh = "ERROR";
+                register_dl = "ERROR";
+            }
+            ui->d_register_l->setText(QString::fromStdString(register_dl));
+            ui->d_register_h->setText(QString::fromStdString(register_dh));
+        }else{
+            //INPUT
+        }
+
+    }else if(program[order_number].order == SUB){// --------------------------------- SUB
+        std::string first, second, answer;
+
+        if(program[order_number].first == "A"){
+            first = register_ah + register_al;
+        }else if(program[order_number].first == "B"){
+            first = register_bh + register_bl;
+        }else if(program[order_number].first == "C"){
+            first = register_ch + register_cl;
+        }else if(program[order_number].first == "D"){
+            first = register_dh + register_dl;
+        }else{
+            std::cout << "ERROR: pobieranie pierwszego rejestru z zapisanego programu\n";
+            // ui->combo_box_one->setCurrentText("ERROR");
+        }
+
+        if(program[order_number].second == "A"){
+            second = register_ah + register_al;
+        }else if(program[order_number].second == "B"){
+            second = register_bh + register_bl;
+        }else if(program[order_number].second == "C"){
+            second = register_ch + register_cl;
+        }else if(program[order_number].second == "D"){
+            second = register_dh + register_dl;
+        }else{                                      // INPUT
+
+            second = program[order_number].second;
+
+            int first_int = binary_to_int(first);
+            int second_int = binary_to_int(second);
+
+            if(first_int < second_int){
+                ui->label_result_less_than_zero->setGeometry(680, 330, 121, 71);
+            }
+
+            int answer_int = first_int - second_int;
+            answer = decimal_to_binary(answer_int);
+
+            if(program[order_number].first == "A"){
+
+                register_ah = "";
+                register_al = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_ah = register_ah + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_al = register_al + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_ah = register_ah + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_al = register_al + answer[i];
+                }else{
+                    register_ah = "ERROR";
+                    register_al = "ERROR";
+                }
+                ui->a_register_l->setText(QString::fromStdString(register_al));
+                ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+            }else if(program[order_number].first == "B"){
+
+                register_bh = "";
+                register_bl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_bh = register_bh + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_bl = register_bl + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_bh = register_bh + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_bl = register_bl + answer[i];
+                }else{
+                    register_bh = "ERROR";
+                    register_bl = "ERROR";
+                }
+                ui->b_register_l->setText(QString::fromStdString(register_bl));
+                ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+            }else if(program[order_number].first == "C"){
+
+                register_ch = "";
+                register_cl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_ch = register_ch + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_cl = register_cl + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_ch = register_ch + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_cl = register_cl + answer[i];
+                }else{
+                    register_ch = "ERROR";
+                    register_cl = "ERROR";
+                }
+                ui->c_register_l->setText(QString::fromStdString(register_cl));
+                ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+            }else if(program[order_number].first == "D"){
+
+                register_dh = "";
+                register_dl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_dh = register_dh + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_dl = register_dl + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_dh = register_dh + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_dl = register_dl + answer[i];
+                }else{
+                    register_dh = "ERROR";
+                    register_dl = "ERROR";
+                }
+                ui->d_register_l->setText(QString::fromStdString(register_dl));
+                ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+            }
+
+        }
+
+        if(program[order_number].second == "A" || program[order_number].second == "B" || program[order_number].second == "C" || program[order_number].second == "D"){
+            if(program[order_number].third == "A"){
+                // std::cout << "\n\nfirst: " << first;
+                // std::cout << "\nsecond: " << first;
+
+                // int binary_to_int(std::string input)
+                int first_int = binary_to_int(first);
+                int second_int = binary_to_int(second);
+                // std::cout << "\nfirst_int: " << first_int;
+                // std::cout << "\nsecond_int: " << second_int;
+
+                if(first_int < second_int){
+                    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 71);
+                }
+
+                // odejmowanie intów
+                int answer_int = first_int - second_int;
+                // std::cout << "\nanswer_int: " << answer_int;
+
+                answer = decimal_to_binary(answer_int);
+                register_ah = "";
+                register_al = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_ah = register_ah + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_al = register_al + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_ah = register_ah + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_al = register_al + answer[i];
+                }else{
+                    register_ah = "ERROR";
+                    register_al = "ERROR";
+                }
+                ui->a_register_l->setText(QString::fromStdString(register_al));
+                ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+            }else if(program[order_number].third == "B"){
+                int first_int = binary_to_int(first);
+                int second_int = binary_to_int(second);
+
+                if(first_int < second_int){
+                    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 71);
+                }
+
+                int answer_int = first_int - second_int;
+                answer = decimal_to_binary(answer_int);
+
+
+                register_bh = "";
+                register_bl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_bh = register_bh + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_bl = register_bl + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_bh = register_bh + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_bl = register_bl + answer[i];
+                }else{
+                    register_bh = "ERROR";
+                    register_bl = "ERROR";
+                }
+                ui->b_register_l->setText(QString::fromStdString(register_bl));
+                ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+            }else if(program[order_number].third == "C"){
+                int first_int = binary_to_int(first);
+                int second_int = binary_to_int(second);
+
+                if(first_int < second_int){
+                    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 71);
+                }
+
+                int answer_int = first_int - second_int;
+                answer = decimal_to_binary(answer_int);
+
+
+                register_ch = "";
+                register_cl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_ch = register_ch + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_cl = register_cl + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_ch = register_ch + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_cl = register_cl + answer[i];
+                }else{
+                    register_ch = "ERROR";
+                    register_cl = "ERROR";
+                }
+                ui->c_register_l->setText(QString::fromStdString(register_cl));
+                ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+            }else if(program[order_number].third == "D"){
+
+                int first_int = binary_to_int(first);
+                int second_int = binary_to_int(second);
+
+                if(first_int < second_int){
+                    ui->label_result_less_than_zero->setGeometry(680, 330, 121, 71);
+                }
+
+                int answer_int = first_int - second_int;
+                answer = decimal_to_binary(answer_int);
+
+
+                register_dh = "";
+                register_dl = "";
+                if(answer.size() == 16){
+                    for(int i = 0; i < 8; i++)
+                        register_dh = register_dh + answer[i];
+                    for(int i = 8; i < 16; i++)
+                        register_dl = register_dl + answer[i];
+                }else if(answer.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                    for(int i = 1; i < 9; i++)
+                        register_dh = register_dh + answer[i];
+                    for(int i = 9; i < 17; i++)
+                        register_dl = register_dl + answer[i];
+                }else{
+                    register_dh = "ERROR";
+                    register_dl = "ERROR";
+                }
+                ui->d_register_l->setText(QString::fromStdString(register_dl));
+                ui->d_register_h->setText(QString::fromStdString(register_dh));
+            }
+        }
 
     }else{
         //ui->label_program->setText("ERROR: nieudane rozpoznanie\nrozkazu przy on_perform_step_button_clicked()");
@@ -1696,4 +2145,12 @@ void MainWindow::on_perform_step_button_clicked()
     if(order_number>how_many_orders)
         order_number = 0;
 
+}
+
+void MainWindow::on_perform_program_button_clicked(){    // wykonaj cały program
+    for(int i = 0; order_number <= how_many_orders; i++){
+        on_perform_step_button_clicked();
+        QThread::msleep(1000);
+        // Sleep();
+    }
 }

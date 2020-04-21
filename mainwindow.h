@@ -246,6 +246,8 @@ private slots:
 
     void on_perform_step_button_clicked();
 
+    void on_perform_program_button_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
