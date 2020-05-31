@@ -1406,13 +1406,36 @@ void MainWindow::on_perform_order_button_clicked(){
         int month   = 1 + ltm->tm_mon;
         int day     = ltm->tm_mday;
 
+        std::string data_str = decimal_to_binary(year);
+        register_ch = "";
+        register_cl = "";
+        for(int i = 0; i < 8; i++)
+            register_ch = register_ch + data_str[i];
+        for(int i = 8; i < 16; i++)
+            register_cl = register_cl + data_str[i];
+        ui->c_register_l->setText(QString::fromStdString(register_cl));
+        ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        data_str = decimal_to_binary(month);
+        register_dh = "";
+        register_dl = "";
+        for(int i = 8; i < 16; i++)
+            register_dh = register_dh + data_str[i];
+        ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+        data_str = decimal_to_binary(day);
+        for(int i = 8; i < 16; i++)
+            register_dl = register_dl + data_str[i];
+        ui->d_register_l->setText(QString::fromStdString(register_dl));
+
+        /*
         char str[20];
         sprintf(str, "%02d.%02d.%04d", day, month, year);
 
         QMessageBox msgBox;
         msgBox.setText(str);
         msgBox.exec();
-
+        */
     }else if(ui->combo_box_order->currentText() == "INT 2CH"){  // ===================================================== POBIERZ CZAS
         // current date/time based on current system
         time_t now = time(NULL);
@@ -1422,17 +1445,145 @@ void MainWindow::on_perform_order_button_clicked(){
         int minute  = ltm->tm_min;
         int second  = ltm->tm_sec;
 
+        register_ch = "";
+        register_cl = "";
+        register_dh = "";
+
+        std::string time_str = decimal_to_binary(hour);
+
+        for(int i = 8; i < 16; i++)
+            register_ch = register_ch + time_str[i];
+        ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        time_str = decimal_to_binary(minute);
+        for(int i = 8; i < 16; i++)
+            register_cl = register_cl + time_str[i];
+        ui->c_register_l->setText(QString::fromStdString(register_cl));
+
+        time_str = decimal_to_binary(second);
+        for(int i = 8; i < 16; i++)
+            register_dh = register_dh + time_str[i];
+        ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+        /*
         char str[20];
         sprintf(str, "%02d:%02d:%02d", hour, minute, second);
 
         QMessageBox msgBox;
         msgBox.setText(str);
         msgBox.exec();
-
+        */
     }else if(ui->combo_box_order->currentText() == "PUSH"){     // ===================================================== WSTAW NA STOS
+        std::string push_str;
+
+        if(ui->combo_box_one->currentText() == "A"){
+            push_str = register_ah + register_al;
+        }else if(ui->combo_box_one->currentText() == "B"){
+            push_str = register_bh + register_bl;
+        }else if(ui->combo_box_one->currentText() == "C"){
+            push_str = register_ch + register_cl;
+        }else if(ui->combo_box_one->currentText() == "D"){
+            push_str = register_dh + register_dl;
+        }else{
+            ui->combo_box_one->setCurrentText("ERROR");
+        }
+
+        int push_int = binary_to_int(push_str);
+        stack[stack_ptr] = push_int;
+        stack_ptr--;
 
     }else if(ui->combo_box_order->currentText() == "POP"){      // ===================================================== ZDEJMIJ ZE STOSU
+        stack_ptr++;
+        int pop_int = stack[stack_ptr];
+        std::string pop_str = decimal_to_binary(pop_int);
 
+        if(ui->combo_box_one->currentText() == "A"){
+
+            register_ah = "";
+            register_al = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ah = register_ah + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_al = register_al + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ah = register_ah + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_al = register_al + pop_str[i];
+            }else{
+                register_ah = "ERROR";
+                register_al = "ERROR";
+            }
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+        }else if(ui->combo_box_one->currentText() == "B"){
+
+            register_bh = "";
+            register_bl = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_bh = register_bh + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_bl = register_bl + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_bh = register_bh + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_bl = register_bl + pop_str[i];
+            }else{
+                register_bh = "ERROR";
+                register_bl = "ERROR";
+            }
+            ui->b_register_l->setText(QString::fromStdString(register_bl));
+            ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+        }else if(ui->combo_box_one->currentText() == "C"){
+
+            register_ch = "";
+            register_cl = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ch = register_ch + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_cl = register_cl + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ch = register_ch + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_cl = register_cl + pop_str[i];
+            }else{
+                register_ch = "ERROR";
+                register_cl = "ERROR";
+            }
+            ui->c_register_l->setText(QString::fromStdString(register_cl));
+            ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        }else if(ui->combo_box_one->currentText() == "D"){
+
+            register_dh = "";
+            register_dl = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_dh = register_dh + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_dl = register_dl + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_dh = register_dh + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_dl = register_dl + pop_str[i];
+            }else{
+                register_dh = "ERROR";
+                register_dl = "ERROR";
+            }
+            ui->d_register_l->setText(QString::fromStdString(register_dl));
+            ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+        }else{
+            ui->combo_box_one->setCurrentText("ERROR");
+        }
     }else{
         ui->combo_box_order->setCurrentText("ERROR");
     }

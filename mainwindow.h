@@ -52,7 +52,7 @@ public:
 
     int order_number = 0;
 
-    short stack[STACK_SIZE];
+    short stack[STACK_SIZE] = {};
     int stack_ptr = STACK_SIZE - 1;
 
     // ----
