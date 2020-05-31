@@ -800,7 +800,6 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
             ui->combo_box_three->setEnabled(false);
         }
     }else if(ui->combo_box_order->currentText() == "INT 00H"){
-
         ui->label_two->setEnabled(false);
         ui->combo_box_one->setEnabled(false);
         ui->combo_box_two->setEnabled(false);
@@ -1395,6 +1394,44 @@ void MainWindow::on_perform_order_button_clicked(){
                 ui->combo_box_three->setCurrentText("ERROR");
             }
         }
+
+    }else if(ui->combo_box_order->currentText() == "INT 00H"){  // ===================================================== ZAKOŃCZ PROGRAM
+        QCoreApplication::quit();
+    }else if(ui->combo_box_order->currentText() == "INT 2AH"){  // ===================================================== POBIERZ DATĘ
+        // current date/time based on current system
+        time_t now = time(NULL);
+        tm *ltm = localtime(&now);
+
+        int year    = 1900 + ltm->tm_year;
+        int month   = 1 + ltm->tm_mon;
+        int day     = ltm->tm_mday;
+
+        char str[20];
+        sprintf(str, "%02d.%02d.%04d", day, month, year);
+
+        QMessageBox msgBox;
+        msgBox.setText(str);
+        msgBox.exec();
+
+    }else if(ui->combo_box_order->currentText() == "INT 2CH"){  // ===================================================== POBIERZ CZAS
+        // current date/time based on current system
+        time_t now = time(NULL);
+        tm *ltm = localtime(&now);
+
+        int hour    = ltm->tm_hour;
+        int minute  = ltm->tm_min;
+        int second  = ltm->tm_sec;
+
+        char str[20];
+        sprintf(str, "%02d:%02d:%02d", hour, minute, second);
+
+        QMessageBox msgBox;
+        msgBox.setText(str);
+        msgBox.exec();
+
+    }else if(ui->combo_box_order->currentText() == "PUSH"){     // ===================================================== WSTAW NA STOS
+
+    }else if(ui->combo_box_order->currentText() == "POP"){      // ===================================================== ZDEJMIJ ZE STOSU
 
     }else{
         ui->combo_box_order->setCurrentText("ERROR");

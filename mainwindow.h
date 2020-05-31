@@ -3,9 +3,12 @@
 
 #include <QMainWindow>
 #include "order.h"
+#include <ctime>    // znajdowanie daty i czasu dla przerwań
+#include <stdio.h>  // sprintf()
 
 
 #define NUMBER_OF_ORDERS_IN_PROGRAM 8   // maxymalna liczba rozkazów przypadająca na pojedynczy program
+#define STACK_SIZE  32
 
 
 QT_BEGIN_NAMESPACE
@@ -48,6 +51,9 @@ public:
     std::string program_str = "";
 
     int order_number = 0;
+
+    short stack[STACK_SIZE];
+    int stack_ptr = STACK_SIZE - 1;
 
     // ----
 
