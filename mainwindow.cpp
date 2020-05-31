@@ -2439,6 +2439,186 @@ void MainWindow::on_perform_step_button_clicked()
                 ui->d_register_h->setText(QString::fromStdString(register_dh));
             }
         }
+    }else if(program[order_number].order == INT_00H){
+
+        QCoreApplication::quit();
+
+    }else if(program[order_number].order == INT_2CH){   // ===================================================== POBIERZ CZAS
+
+        // current date/time based on current system
+        time_t now = time(NULL);
+        tm *ltm = localtime(&now);
+
+        int hour    = ltm->tm_hour;
+        int minute  = ltm->tm_min;
+        int second  = ltm->tm_sec;
+
+        register_ch = "";
+        register_cl = "";
+        register_dh = "";
+
+        std::string time_str = decimal_to_binary(hour);
+
+        for(int i = 8; i < 16; i++)
+            register_ch = register_ch + time_str[i];
+        ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        time_str = decimal_to_binary(minute);
+        for(int i = 8; i < 16; i++)
+            register_cl = register_cl + time_str[i];
+        ui->c_register_l->setText(QString::fromStdString(register_cl));
+
+        time_str = decimal_to_binary(second);
+        for(int i = 8; i < 16; i++)
+            register_dh = register_dh + time_str[i];
+        ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+
+    }else if(program[order_number].order == INT_2AH){   // ===================================================== POBIERZ DATĘ
+
+        // current date/time based on current system
+        time_t now = time(NULL);
+        tm *ltm = localtime(&now);
+
+        int year    = 1900 + ltm->tm_year;
+        int month   = 1 + ltm->tm_mon;
+        int day     = ltm->tm_mday;
+
+        std::string data_str = decimal_to_binary(year);
+        register_ch = "";
+        register_cl = "";
+        for(int i = 0; i < 8; i++)
+            register_ch = register_ch + data_str[i];
+        for(int i = 8; i < 16; i++)
+            register_cl = register_cl + data_str[i];
+        ui->c_register_l->setText(QString::fromStdString(register_cl));
+        ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        data_str = decimal_to_binary(month);
+        register_dh = "";
+        register_dl = "";
+        for(int i = 8; i < 16; i++)
+            register_dh = register_dh + data_str[i];
+        ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+        data_str = decimal_to_binary(day);
+        for(int i = 8; i < 16; i++)
+            register_dl = register_dl + data_str[i];
+        ui->d_register_l->setText(QString::fromStdString(register_dl));
+
+    }else if(program[order_number].order == PUSH){     // ===================================================== WSTAW NA STOS
+
+        std::string push_str;
+
+        if(program[order_number].first == "A"){
+            push_str = register_ah + register_al;
+        }else if(program[order_number].first == "B"){
+            push_str = register_bh + register_bl;
+        }else if(program[order_number].first == "C"){
+            push_str = register_ch + register_cl;
+        }else if(program[order_number].first == "D"){
+            push_str = register_dh + register_dl;
+        }else{
+            std::cout << "ERROR: pobieranie rejestru z zapisanego programu do PUSH\n";
+        }
+
+        int push_int = binary_to_int(push_str);
+        stack[stack_ptr] = push_int;
+        stack_ptr--;
+
+    }else if(program[order_number].order == POP){   // ===================================================== ZDEJMIJ ZE STOSU
+
+        stack_ptr++;
+        int pop_int = stack[stack_ptr];
+        std::string pop_str = decimal_to_binary(pop_int);
+
+        if(program[order_number].first == "A"){
+
+            register_ah = "";
+            register_al = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ah = register_ah + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_al = register_al + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ah = register_ah + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_al = register_al + pop_str[i];
+            }else{
+                register_ah = "ERROR";
+                register_al = "ERROR";
+            }
+            ui->a_register_l->setText(QString::fromStdString(register_al));
+            ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+        }else if(program[order_number].first == "B"){
+
+            register_bh = "";
+            register_bl = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_bh = register_bh + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_bl = register_bl + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_bh = register_bh + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_bl = register_bl + pop_str[i];
+            }else{
+                register_bh = "ERROR";
+                register_bl = "ERROR";
+            }
+            ui->b_register_l->setText(QString::fromStdString(register_bl));
+            ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+        }else if(program[order_number].first == "C"){
+
+            register_ch = "";
+            register_cl = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_ch = register_ch + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_cl = register_cl + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_ch = register_ch + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_cl = register_cl + pop_str[i];
+            }else{
+                register_ch = "ERROR";
+                register_cl = "ERROR";
+            }
+            ui->c_register_l->setText(QString::fromStdString(register_cl));
+            ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        }else if(program[order_number].first == "D"){
+
+            register_dh = "";
+            register_dl = "";
+            if(pop_str.size() == 16){
+                for(int i = 0; i < 8; i++)
+                    register_dh = register_dh + pop_str[i];
+                for(int i = 8; i < 16; i++)
+                    register_dl = register_dl + pop_str[i];
+            }else if(pop_str.size() == 17){  // ============================ w przypadku przepełnienia tracimy 'wystającą' poza rejestr jedynkę
+                for(int i = 1; i < 9; i++)
+                    register_dh = register_dh + pop_str[i];
+                for(int i = 9; i < 17; i++)
+                    register_dl = register_dl + pop_str[i];
+            }else{
+                register_dh = "ERROR";
+                register_dl = "ERROR";
+            }
+            ui->d_register_l->setText(QString::fromStdString(register_dl));
+            ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+        }else{
+            std::cout << "ERROR: pobieranie rejestru z zapisanego programu do POP\n";
+        }
 
     }else{
         //ui->label_program->setText("ERROR: nieudane rozpoznanie\nrozkazu przy on_perform_step_button_clicked()");
