@@ -4211,6 +4211,31 @@
       <string>SUB</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>INT 00H</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 2AH</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 2CH</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PUSH</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>POP</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_one">
     <property name="geometry">

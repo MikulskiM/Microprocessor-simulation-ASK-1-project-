@@ -781,6 +781,8 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
         ui->label_one->setText("-");
         ui->label_two->setEnabled(true);
         ui->label_two->setText("=>");
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(true);
         ui->combo_box_three->setEnabled(true);
         if(ui->combo_box_two->currentText() == "INPUT"){
             ui->label_two->setEnabled(false);
@@ -790,11 +792,39 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
         ui->label_one->setText("+");
         ui->label_two->setEnabled(true);
         ui->label_two->setText("=>");
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(true);
         ui->combo_box_three->setEnabled(true);
         if(ui->combo_box_two->currentText() == "INPUT"){
             ui->label_two->setEnabled(false);
             ui->combo_box_three->setEnabled(false);
         }
+    }else if(ui->combo_box_order->currentText() == "INT 00H"){
+
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 2AH"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 2CH"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "PUSH"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "POP"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
     }else{  // MOV
         if(ui->combo_box_two->currentText() == "INPUT"){
             ui->label_one->setText("<=");
@@ -804,6 +834,8 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
         ui->label_two->setText("");
         ui->label_two->setEnabled(false);
         ui->combo_box_three->setCurrentText("");
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(true);
         ui->combo_box_three->setEnabled(false);
     }
 
