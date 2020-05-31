@@ -1600,6 +1600,16 @@ void MainWindow::display_program(){
             program_str += "SUB";
         else if(program[i].order == MOV)
             program_str += "MOV";
+        else if(program[i].order == INT_00H)
+            program_str += "INT 00H";
+        else if(program[i].order == INT_2AH)
+            program_str += "INT 2AH";
+        else if(program[i].order == INT_2CH)
+            program_str += "INT 2CH";
+        else if(program[i].order == PUSH)
+            program_str += "PUSH";
+        else if(program[i].order == POP)
+            program_str += "POP";
         else
             program_str += "???";
         program_str += " ";
@@ -1613,6 +1623,8 @@ void MainWindow::display_program(){
             program_str += "C";
         else if(program[i].first == "D")
             program_str += "D";
+        else if(program[i].first == "_")
+            program_str += "_";
         else
             program_str += "?";
         program_str += " ";
@@ -1689,43 +1701,28 @@ void MainWindow::on_save_order_button_clicked()
             program[how_many_orders-1].order = ADD;
         else if(ui->combo_box_order->currentText() == "SUB")
             program[how_many_orders-1].order = SUB;
+        else if(ui->combo_box_order->currentText() == "INT 00H")
+            program[how_many_orders-1].order = INT_00H;
+        else if(ui->combo_box_order->currentText() == "INT 2AH")
+            program[how_many_orders-1].order = INT_2AH;
+        else if(ui->combo_box_order->currentText() == "INT 2CH")
+            program[how_many_orders-1].order = INT_2CH;
+        else if(ui->combo_box_order->currentText() == "PUSH")
+            program[how_many_orders-1].order = PUSH;
+        else if(ui->combo_box_order->currentText() == "POP")
+            program[how_many_orders-1].order = POP;
+        if(ui->combo_box_order->currentText() == "INT 2CH" ||
+                ui->combo_box_order->currentText() == "INT 2AH" ||
+                     ui->combo_box_order->currentText() == "INT 00H"){
 
-        if(ui->combo_box_two->currentText() == "INPUT"){    // tryb natychmiastowy adresowania
+            program[how_many_orders-1].first = "_";
+            program[how_many_orders-1].second = "_";
+            program[how_many_orders-1].third = "_";
 
-            program[how_many_orders-1].second = input_h + input_l;
-            std::cout << "program[" << how_many_orders-1 << "].second = (input) " << input_h << input_l << "\n";
-
-            if(ui->combo_box_one->currentText() == "A"){
-
-                program[how_many_orders-1].first = "A";
-                program[how_many_orders-1].third = "_";
-                /*
-                program[how_many_orders-1].first = register_ah + register_al;
-                program[how_many_orders-1].third = "_";
-                */
-            }
-            else if(ui->combo_box_one->currentText() == "B"){
-
-                program[how_many_orders-1].first = "B";
-                program[how_many_orders-1].third = "_";
-            }
-            else if(ui->combo_box_one->currentText() == "C"){
-
-                program[how_many_orders-1].first = "C";
-                program[how_many_orders-1].third = "_";
-            }
-            else if(ui->combo_box_one->currentText() == "D"){
-
-                program[how_many_orders-1].first = "D";
-                program[how_many_orders-1].third = "_";
-            }
-
-        }else{ // -------------------------------------------- tryb rejestrowy adresowania
+        }else if(ui->combo_box_order->currentText() == "POP" || ui->combo_box_order->currentText() == "PUSH"){
 
             if(ui->combo_box_one->currentText() == "A"){
-
                 program[how_many_orders-1].first = "A";
-                // program[how_many_orders-1].first = register_ah + register_al;
             }
             else if(ui->combo_box_one->currentText() == "B"){
                 program[how_many_orders-1].first = "B";
@@ -1737,36 +1734,90 @@ void MainWindow::on_save_order_button_clicked()
                 program[how_many_orders-1].first = "D";
             }
 
-            if(ui->combo_box_two->currentText() == "A"){
-                program[how_many_orders-1].second = "A";
-            }
-            else if(ui->combo_box_two->currentText() == "B"){
-                program[how_many_orders-1].second = "B";
-            }
-            else if(ui->combo_box_two->currentText() == "C"){
-                program[how_many_orders-1].second = "C";
-            }
-            else if(ui->combo_box_two->currentText() == "D"){
-                program[how_many_orders-1].second = "D";
-            }
+            program[how_many_orders-1].second = "_";
+            program[how_many_orders-1].third = "_";
 
-            if(ui->combo_box_order->currentText() == "MOV")
-                program[how_many_orders-1].third = "_";
-            else{
-                if(ui->combo_box_three->currentText() == "A"){
-                    program[how_many_orders-1].third = "A";
+        }else{
+
+            if(ui->combo_box_two->currentText() == "INPUT"){    // tryb natychmiastowy adresowania
+
+                program[how_many_orders-1].second = input_h + input_l;
+                std::cout << "program[" << how_many_orders-1 << "].second = (input) " << input_h << input_l << "\n";
+
+                if(ui->combo_box_one->currentText() == "A"){
+
+                    program[how_many_orders-1].first = "A";
+                    program[how_many_orders-1].third = "_";
+                    /*
+                    program[how_many_orders-1].first = register_ah + register_al;
+                    program[how_many_orders-1].third = "_";
+                    */
                 }
-                else if(ui->combo_box_three->currentText() == "B"){
-                    program[how_many_orders-1].third = "B";
+                else if(ui->combo_box_one->currentText() == "B"){
+
+                    program[how_many_orders-1].first = "B";
+                    program[how_many_orders-1].third = "_";
                 }
-                else if(ui->combo_box_three->currentText() == "C"){
-                    program[how_many_orders-1].third = "C";
+                else if(ui->combo_box_one->currentText() == "C"){
+
+                    program[how_many_orders-1].first = "C";
+                    program[how_many_orders-1].third = "_";
                 }
-                else if(ui->combo_box_three->currentText() == "D"){
-                    program[how_many_orders-1].third = "D";
+                else if(ui->combo_box_one->currentText() == "D"){
+
+                    program[how_many_orders-1].first = "D";
+                    program[how_many_orders-1].third = "_";
+                }
+
+            }else{ // -------------------------------------------- tryb rejestrowy adresowania
+
+                if(ui->combo_box_one->currentText() == "A"){
+
+                    program[how_many_orders-1].first = "A";
+                    // program[how_many_orders-1].first = register_ah + register_al;
+                }
+                else if(ui->combo_box_one->currentText() == "B"){
+                    program[how_many_orders-1].first = "B";
+                }
+                else if(ui->combo_box_one->currentText() == "C"){
+                    program[how_many_orders-1].first = "C";
+                }
+                else if(ui->combo_box_one->currentText() == "D"){
+                    program[how_many_orders-1].first = "D";
+                }
+
+                if(ui->combo_box_two->currentText() == "A"){
+                    program[how_many_orders-1].second = "A";
+                }
+                else if(ui->combo_box_two->currentText() == "B"){
+                    program[how_many_orders-1].second = "B";
+                }
+                else if(ui->combo_box_two->currentText() == "C"){
+                    program[how_many_orders-1].second = "C";
+                }
+                else if(ui->combo_box_two->currentText() == "D"){
+                    program[how_many_orders-1].second = "D";
+                }
+
+                if(ui->combo_box_order->currentText() == "MOV")
+                    program[how_many_orders-1].third = "_";
+                else{
+                    if(ui->combo_box_three->currentText() == "A"){
+                        program[how_many_orders-1].third = "A";
+                    }
+                    else if(ui->combo_box_three->currentText() == "B"){
+                        program[how_many_orders-1].third = "B";
+                    }
+                    else if(ui->combo_box_three->currentText() == "C"){
+                        program[how_many_orders-1].third = "C";
+                    }
+                    else if(ui->combo_box_three->currentText() == "D"){
+                        program[how_many_orders-1].third = "D";
+                    }
                 }
             }
         }
+
         // ----------- wyś◘wietlam aktualny program
         display_program();
         display_order_numbers();
@@ -1801,33 +1852,65 @@ void MainWindow::on_load_program_button_clicked()
         QString line = in.readLine();
         std::string line_str = line.toStdString();
 
-        if(line_str.substr(0,3) == "MOV")
-            program[how_many_orders].order = MOV;
-        else if(line_str.substr(0,3) == "ADD")
-            program[how_many_orders].order = ADD;
-        else if(line_str.substr(0,3) == "SUB")
-            program[how_many_orders].order = SUB;
+        if(line_str.substr(0,7) == "INT 00H" || line_str.substr(0,7) == "INT 2AH" || line_str.substr(0,7) == "INT 2CH"){
 
-        if(line_str[4] == 'A')
-            program[how_many_orders].first = "A";
-        else if(line_str[4] == 'B')
-            program[how_many_orders].first = "B";
-        else if(line_str[4] == 'C')
-            program[how_many_orders].first = "C";
-        else if(line_str[4] == 'D')
-            program[how_many_orders].first = "D";
+            if(line_str.substr(0,7) == "INT 00H")
+                program[how_many_orders].order = INT_00H;
+            else if(line_str.substr(0,7) == "INT 2AH")
+                program[how_many_orders].order = INT_2AH;
+            else if(line_str.substr(0,7) == "INT 2CH")
+                program[how_many_orders].order = INT_2CH;
 
-        if(line_str[6] == '0' || line_str[6] == '1'){
-            program[how_many_orders].second = line_str.substr(6,16);
+            program[how_many_orders].first = "_";
+            program[how_many_orders].second = "_";
             program[how_many_orders].third = "_";
+
+        }else if(line_str.substr(0,4) == "PUSH"){
+
+            program[how_many_orders].order = PUSH;
+
+            if(line_str[5] == 'A')
+                program[how_many_orders].first = "A";
+            else if(line_str[5] == 'B')
+                program[how_many_orders].first = "B";
+            else if(line_str[5] == 'C')
+                program[how_many_orders].first = "C";
+            else if(line_str[5] == 'D')
+                program[how_many_orders].first = "D";
+
+            program[how_many_orders].second = "_";
+            program[how_many_orders].third = "_";
+
         }else{
-            program[how_many_orders].second = line_str[6];
-            program[how_many_orders].third = line_str[8];
+
+            if(line_str.substr(0,3) == "MOV")
+                program[how_many_orders].order = MOV;
+            else if(line_str.substr(0,3) == "ADD")
+                program[how_many_orders].order = ADD;
+            else if(line_str.substr(0,3) == "SUB")
+                program[how_many_orders].order = SUB;
+            else if(line_str.substr(0,3) == "POP")
+                program[how_many_orders].order = POP;
+
+            if(line_str[4] == 'A')
+                program[how_many_orders].first = "A";
+            else if(line_str[4] == 'B')
+                program[how_many_orders].first = "B";
+            else if(line_str[4] == 'C')
+                program[how_many_orders].first = "C";
+            else if(line_str[4] == 'D')
+                program[how_many_orders].first = "D";
+
+            if(line_str[6] == '0' || line_str[6] == '1'){
+                program[how_many_orders].second = line_str.substr(6,16);
+                program[how_many_orders].third = "_";
+            }else{
+                program[how_many_orders].second = line_str[6];
+                program[how_many_orders].third = line_str[8];
+            }
         }
 
-
         std::cout << line_str << "\n";
-
 
         how_many_orders++;
     }

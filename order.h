@@ -13,7 +13,12 @@
 typedef enum{
     MOV,
     ADD,
-    SUB
+    SUB,
+    INT_00H,
+    INT_2AH,
+    INT_2CH,
+    PUSH,
+    POP
 }order_type;
 
 typedef struct{
