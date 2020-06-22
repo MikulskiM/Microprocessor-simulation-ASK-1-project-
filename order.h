@@ -18,7 +18,14 @@ typedef enum{
     INT_2AH,
     INT_2CH,
     PUSH,
-    POP
+    POP,
+    INT_0DH,
+    INT_41H,
+    INT_56H,
+    INT_47H,
+    INT_48H,
+    INT_49H,
+    INT_4AH
 }order_type;
 
 typedef struct{

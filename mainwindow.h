@@ -5,6 +5,7 @@
 #include "order.h"
 #include <ctime>    // znajdowanie daty i czasu dla przerwań
 #include <stdio.h>  // sprintf()
+#include <list>     // list template - do przerwań 48H, 49H, 4AH - bloki pamięci
 
 
 #define NUMBER_OF_ORDERS_IN_PROGRAM 8   // maxymalna liczba rozkazów przypadająca na pojedynczy program
@@ -54,6 +55,11 @@ public:
 
     short stack[STACK_SIZE] = {};
     int stack_ptr = STACK_SIZE - 1;
+
+    std::list <std::string> memory_blocks;
+
+    std::string program_file_name = "my_program.txt";
+    // std::string directory = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\";
 
     // ----
 

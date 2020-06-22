@@ -3,10 +3,15 @@
 
 #include <cmath>
 #include <iostream>
+#include <cstdio>       // do rename() i remove()
 #include <QFile>        // do zapisywania w pliku   |
 #include <QTextStream>  // do zapisywania w pliku   |
 #include <QMessageBox>
 #include <QThread>      // delay in performing whole program
+#include <direct.h>     // _getcwd() znajdowanie current directory
+#include <QInputDialog> // dla okienek pobierających text od użytkownika
+#include <QDir>         // QDir jest używany przy okienkach pobierającyh text od użytkownika
+#include <fstream>      // std::ofstream()
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,6 +23,27 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+std::string get_current_dir(){
+    char buff[FILENAME_MAX]; //create string buffer to hold path
+    _getcwd( buff, FILENAME_MAX );
+    std::string current_working_dir(buff);
+
+    return current_working_dir;
+}
+
+std::string get_current_dir(std::string show_msgBox){
+    char buff[FILENAME_MAX]; //create string buffer to hold path
+    _getcwd( buff, FILENAME_MAX );
+    std::string current_working_dir(buff);
+
+    if(show_msgBox == "show"){
+        QMessageBox msgBox;
+        msgBox.setText(QString::fromStdString(current_working_dir));
+        msgBox.exec();
+    }
+    return current_working_dir;
 }
 
 std::string addBinary(std::string a, std::string b){
@@ -824,6 +850,41 @@ void MainWindow::on_combo_box_order_currentIndexChanged(int index)
         ui->combo_box_one->setEnabled(true);
         ui->combo_box_two->setEnabled(false);
         ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 0DH"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 41H"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 47H"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 56H"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 48H"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 49H"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(false);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
+    }else if(ui->combo_box_order->currentText() == "INT 4AH"){
+        ui->label_two->setEnabled(false);
+        ui->combo_box_one->setEnabled(true);
+        ui->combo_box_two->setEnabled(false);
+        ui->combo_box_three->setEnabled(false);
     }else{  // MOV
         if(ui->combo_box_two->currentText() == "INPUT"){
             ui->label_one->setText("<=");
@@ -1584,6 +1645,127 @@ void MainWindow::on_perform_order_button_clicked(){
         }else{
             ui->combo_box_one->setCurrentText("ERROR");
         }
+    }else if(ui->combo_box_order->currentText() == "INT 0DH"){  // ===================================================== RESET DYSKU
+        // zeruj rejestry i program
+
+        // kasuj zawartość pliku z programem
+        std::ofstream ofs;
+        ofs.open(program_file_name, std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+
+        // zeruj zawartośc rejestrów
+        register_al = "00000000";
+        register_ah = "00000000";
+        ui->a_register_l->setText(QString::fromStdString(register_al));
+        ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+        register_cl = "00000000";
+        register_ch = "00000000";
+        ui->c_register_l->setText(QString::fromStdString(register_cl));
+        ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        register_bl = "00000000";
+        register_bh = "00000000";
+        ui->b_register_l->setText(QString::fromStdString(register_bl));
+        ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+        register_dl = "00000000";
+        register_dh = "00000000";
+        ui->d_register_l->setText(QString::fromStdString(register_dl));
+        ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+    }else if(ui->combo_box_order->currentText() == "INT 41H"){  // ===================================================== KASUJ PLIK (plik programu)
+        // remove("filename.txt")
+        const char *filename = program_file_name.c_str();
+
+        std::remove(filename);
+
+
+    }else if(ui->combo_box_order->currentText() == "INT 47H"){  // ===================================================== POBIERZ AKTUALNY KATALOG/DIRECTORY
+        // getcwd(buff, filename)
+        get_current_dir("show");
+
+    }else if(ui->combo_box_order->currentText() == "INT 56H"){  // ===================================================== ZMIEŃ NAZWĘ PLIKU (plik programu)
+        // rename(oldname, newname)
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Okno nowej nazwy pliku programu"),
+                                                 tr("nowa nazwa pliku programu:"), QLineEdit::Normal,
+                                                 QDir::home().dirName(), &ok);
+
+        if (ok && !text.isEmpty()){
+            if(text.contains(".txt", Qt::CaseSensitive)){
+                // text kończy się ".txt" to nie dokładaj ".txt"
+            }else{
+                // dodaj ".txt" na końcu nowej nazwy pliku otrzymanej od użytkownika
+                text = text + ".txt";
+            }
+
+            //konwersja z std::string lub Qstring na const char*
+            const char *c_old_name = program_file_name.c_str();
+
+            QByteArray ba = text.toLocal8Bit();
+            const char *c_new_name = ba.data();
+
+            std::rename(c_old_name, c_new_name);
+            program_file_name = text.toStdString();
+
+        }
+
+    }else if(ui->combo_box_order->currentText() == "INT 48H"){  // ===================================================== ALOKUJ BLOK PAMIĘCI
+        // <list> push_front(ah + al)
+
+        if(ui->combo_box_one->currentText() == "A"){
+            memory_blocks.push_front(register_ah + register_al);
+        }else if(ui->combo_box_one->currentText() == "B"){
+            memory_blocks.push_front(register_bh + register_bl);
+        }else if(ui->combo_box_one->currentText() == "C"){
+            memory_blocks.push_front(register_ch + register_cl);
+        }else if(ui->combo_box_one->currentText() == "D"){
+            memory_blocks.push_front(register_dh + register_dl);
+        }else{
+            std::cout << "ERROR INT 48H: Nie udalo sie utworzyc nowego bloku pamieci\n";
+        }
+
+    }else if(ui->combo_box_order->currentText() == "INT 49H"){  // ===================================================== ZWOLNIJ ZAALOKOWANĄ PAMIĘĆ
+        // <list> clear()
+        memory_blocks.clear();
+
+
+    }else if(ui->combo_box_order->currentText() == "INT 4AH"){  // ===================================================== MODYFIKUJ ZAALOKOWANE BLOKI PAMIĘCI
+        // for(list.size): list[i] = "new content"
+
+        // counter = 0;
+        // if(empty == false){
+        //    counter++;
+        //    pop_back()
+        // }
+        // for(counter){
+        //    push_front(A/B/C/D)
+
+        uint8_t counter = 0;    // max 256
+
+        while(memory_blocks.empty() == false){
+            counter++;
+            memory_blocks.pop_back();
+        }
+
+        for(uint8_t i = 0; i < counter; i++){
+
+            if(ui->combo_box_one->currentText() == "A"){
+                memory_blocks.push_front(register_ah + register_al);
+            }else if(ui->combo_box_one->currentText() == "B"){
+                memory_blocks.push_front(register_bh + register_bl);
+            }else if(ui->combo_box_one->currentText() == "C"){
+                memory_blocks.push_front(register_ch + register_cl);
+            }else if(ui->combo_box_one->currentText() == "D"){
+                memory_blocks.push_front(register_dh + register_dl);
+            }else{
+                std::cout << "ERROR INT 4AH: Nie udalo sie wstawic zamiennego bloku pamieci\n";
+            }
+
+        }
+
+
     }else{
         ui->combo_box_order->setCurrentText("ERROR");
     }
@@ -1610,6 +1792,20 @@ void MainWindow::display_program(){
             program_str += "PUSH";
         else if(program[i].order == POP)
             program_str += "POP";
+        else if(program[i].order == INT_0DH)
+            program_str += "INT 0DH";
+        else if(program[i].order == INT_41H)
+            program_str += "INT 41H";
+        else if(program[i].order == INT_47H)
+            program_str += "INT 47H";
+        else if(program[i].order == INT_56H)
+            program_str += "INT 56H";
+        else if(program[i].order == INT_48H)
+            program_str += "INT 48H";
+        else if(program[i].order == INT_49H)
+            program_str += "INT 49H";
+        else if(program[i].order == INT_4AH)
+            program_str += "INT 4AH";
         else
             program_str += "???";
         program_str += " ";
@@ -1711,15 +1907,37 @@ void MainWindow::on_save_order_button_clicked()
             program[how_many_orders-1].order = PUSH;
         else if(ui->combo_box_order->currentText() == "POP")
             program[how_many_orders-1].order = POP;
+        else if(ui->combo_box_order->currentText() == "INT 0DH")
+            program[how_many_orders-1].order = INT_0DH;
+        else if(ui->combo_box_order->currentText() == "INT 41H")
+            program[how_many_orders-1].order = INT_41H;
+        else if(ui->combo_box_order->currentText() == "INT 47H")
+            program[how_many_orders-1].order = INT_47H;
+        else if(ui->combo_box_order->currentText() == "INT 56H")
+            program[how_many_orders-1].order = INT_56H;
+        else if(ui->combo_box_order->currentText() == "INT 48H")
+            program[how_many_orders-1].order = INT_48H;
+        else if(ui->combo_box_order->currentText() == "INT 49H")
+            program[how_many_orders-1].order = INT_49H;
+        else if(ui->combo_box_order->currentText() == "INT 4AH")
+            program[how_many_orders-1].order = INT_4AH;
+
+
         if(ui->combo_box_order->currentText() == "INT 2CH" ||
                 ui->combo_box_order->currentText() == "INT 2AH" ||
-                     ui->combo_box_order->currentText() == "INT 00H"){
+                ui->combo_box_order->currentText() == "INT 00H" ||
+                ui->combo_box_order->currentText() == "INT 0DH" ||
+                ui->combo_box_order->currentText() == "INT 41H" ||
+                ui->combo_box_order->currentText() == "INT 47H" ||
+                ui->combo_box_order->currentText() == "INT 56H" ||
+                ui->combo_box_order->currentText() == "INT 49H"){
 
             program[how_many_orders-1].first = "_";
             program[how_many_orders-1].second = "_";
             program[how_many_orders-1].third = "_";
 
-        }else if(ui->combo_box_order->currentText() == "POP" || ui->combo_box_order->currentText() == "PUSH"){
+        }else if(ui->combo_box_order->currentText() == "POP" || ui->combo_box_order->currentText() == "PUSH"
+                  || ui->combo_box_order->currentText() == "INT 48H" || ui->combo_box_order->currentText() == "INT 4AH"){
 
             if(ui->combo_box_one->currentText() == "A"){
                 program[how_many_orders-1].first = "A";
@@ -1826,9 +2044,15 @@ void MainWindow::on_save_order_button_clicked()
 
 void MainWindow::on_save_program_button_clicked()
 {
-    QString filename = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\my_program.txt";
+    // QString filename = QString::fromStdString(program_file_name);
+    // directory = getcwd()
+    // directory append(filename)
+
+    // zapisanie stringa program_str w pliku
+    // QString filename = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\my_program.txt";
+    QString filename = QString::fromStdString(program_file_name);
     QFile file(filename);
-    if (file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         stream << QString::fromStdString(program_str) << endl;
     }
@@ -1837,7 +2061,8 @@ void MainWindow::on_save_program_button_clicked()
 
 void MainWindow::on_load_program_button_clicked()
 {
-    QString filename = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\my_program.txt";
+    // QString filename = "D:\\PROJEKTY\\Qt_PROJECTS\\Microprocessor-simulation-ASK-1-project-\\my_program.txt";
+    QString filename = QString::fromStdString(program_file_name);
     QFile file(filename);
     if(!file.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, "error", file.errorString());
@@ -1852,7 +2077,10 @@ void MainWindow::on_load_program_button_clicked()
         QString line = in.readLine();
         std::string line_str = line.toStdString();
 
-        if(line_str.substr(0,7) == "INT 00H" || line_str.substr(0,7) == "INT 2AH" || line_str.substr(0,7) == "INT 2CH"){
+        if(line_str.substr(0,7) == "INT 00H" || line_str.substr(0,7) == "INT 2AH" || line_str.substr(0,7) == "INT 2CH"
+                || line_str.substr(0,7) == "INT 0DH" || line_str.substr(0,7) == "INT 41H" || line_str.substr(0,7) == "INT 47H"
+                 || line_str.substr(0,7) == "INT 56H" || line_str.substr(0,7) == "INT 49H" || line_str.substr(0,7) == "INT 48H"
+                 || line_str.substr(0,7) == "INT 4AH"){
 
             if(line_str.substr(0,7) == "INT 00H")
                 program[how_many_orders].order = INT_00H;
@@ -1860,10 +2088,45 @@ void MainWindow::on_load_program_button_clicked()
                 program[how_many_orders].order = INT_2AH;
             else if(line_str.substr(0,7) == "INT 2CH")
                 program[how_many_orders].order = INT_2CH;
+            else if(line_str.substr(0,7) == "INT 0DH")
+                program[how_many_orders].order = INT_0DH;
+            else if(line_str.substr(0,7) == "INT 41H")
+                program[how_many_orders].order = INT_41H;
+            else if(line_str.substr(0,7) == "INT 47H")
+                program[how_many_orders].order = INT_47H;
+            else if(line_str.substr(0,7) == "INT 56H")
+                program[how_many_orders].order = INT_56H;
+            else if(line_str.substr(0,7) == "INT 49H")
+                program[how_many_orders].order = INT_49H;
 
             program[how_many_orders].first = "_";
             program[how_many_orders].second = "_";
             program[how_many_orders].third = "_";
+
+
+            if(line_str.substr(0,7) == "INT 48H"){
+                program[how_many_orders].order = INT_48H;
+                if(line_str[7] == 'A')
+                    program[how_many_orders].first = "A";
+                else if(line_str[7] == 'B')
+                    program[how_many_orders].first = "B";
+                else if(line_str[7] == 'C')
+                    program[how_many_orders].first = "C";
+                else if(line_str[7] == 'D')
+                    program[how_many_orders].first = "D";
+
+            }else if(line_str.substr(0,7) == "INT 4AH"){
+                program[how_many_orders].order = INT_4AH;
+                if(line_str[7] == 'A')
+                    program[how_many_orders].first = "A";
+                else if(line_str[7] == 'B')
+                    program[how_many_orders].first = "B";
+                else if(line_str[7] == 'C')
+                    program[how_many_orders].first = "C";
+                else if(line_str[7] == 'D')
+                    program[how_many_orders].first = "D";
+
+            }
 
         }else if(line_str.substr(0,4) == "PUSH"){
 
@@ -2620,8 +2883,115 @@ void MainWindow::on_perform_step_button_clicked()
             std::cout << "ERROR: pobieranie rejestru z zapisanego programu do POP\n";
         }
 
+    }else if(program[order_number].order == INT_0DH){   // ===================================================== RESET DYSKU
+        // zeruj rejestry i program
+
+        // kasuj zawartość pliku z programem
+        std::ofstream ofs;
+        ofs.open(program_file_name, std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+
+        // zeruj zawartośc rejestrów
+        register_al = "00000000";
+        register_ah = "00000000";
+        ui->a_register_l->setText(QString::fromStdString(register_al));
+        ui->a_register_h->setText(QString::fromStdString(register_ah));
+
+        register_cl = "00000000";
+        register_ch = "00000000";
+        ui->c_register_l->setText(QString::fromStdString(register_cl));
+        ui->c_register_h->setText(QString::fromStdString(register_ch));
+
+        register_bl = "00000000";
+        register_bh = "00000000";
+        ui->b_register_l->setText(QString::fromStdString(register_bl));
+        ui->b_register_h->setText(QString::fromStdString(register_bh));
+
+        register_dl = "00000000";
+        register_dh = "00000000";
+        ui->d_register_l->setText(QString::fromStdString(register_dl));
+        ui->d_register_h->setText(QString::fromStdString(register_dh));
+
+    }else if(program[order_number].order == INT_41H){   // ===================================================== KASUJ PLIK (plik programu)
+        // remove("filename.txt")
+        const char *filename = program_file_name.c_str();
+
+        std::remove(filename);
+
+    }else if(program[order_number].order == INT_47H){   // ===================================================== POBIERZ AKTUALNY KATALOG / DIRECTORY
+        get_current_dir("show");
+
+    }else if(program[order_number].order == INT_56H){   // ===================================================== ZMIEŃu NAZWĘ PLIKU (plik programu)
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Okno nowej nazwy pliku programu"),
+                                                 tr("nowa nazwa pliku programu:"), QLineEdit::Normal,
+                                                 QDir::home().dirName(), &ok);
+
+        if (ok && !text.isEmpty()){
+            if(text.contains(".txt", Qt::CaseSensitive)){
+                // text kończy się ".txt" to nie dokładaj ".txt"
+            }else{
+                // dodaj ".txt" na końcu nowej nazwy pliku otrzymanej od użytkownika
+                text = text + ".txt";
+            }
+
+            //konwersja z std::string lub Qstring na const char*
+            const char *c_old_name = program_file_name.c_str();
+
+            QByteArray ba = text.toLocal8Bit();
+            const char *c_new_name = ba.data();
+
+            std::rename(c_old_name, c_new_name);
+            program_file_name = text.toStdString();
+        }
+
+    }else if(program[order_number].order == INT_48H){   // ===================================================== ALOKUJ BLOK PAMIĘCI
+
+        if(program[order_number].first == "A"){
+            memory_blocks.push_front(register_ah + register_al);
+        }else if(program[order_number].first == "B"){
+            memory_blocks.push_front(register_bh + register_bl);
+        }else if(program[order_number].first == "C"){
+            memory_blocks.push_front(register_ch + register_cl);
+        }else if(program[order_number].first == "D"){
+            memory_blocks.push_front(register_dh + register_dl);
+        }else{
+            std::cout << "ERROR INT 48H: Nie udalo sie utworzyc nowego bloku pamieci\n";
+        }
+
+
+    }else if(program[order_number].order == INT_49H){   // ===================================================== ZWOLNIJ ZAALOKOWANĄ PAMIĘĆ
+        // <list> clear()
+        memory_blocks.clear();
+
+
+    }else if(program[order_number].order == INT_4AH){   // ===================================================== MODYFIKUJ ZAALOKOWANĄ PAMIĘĆ
+
+        uint8_t counter = 0;    // max 256
+
+        while(memory_blocks.empty() == false){
+            counter++;
+            memory_blocks.pop_back();
+        }
+
+        for(uint8_t i = 0; i < counter; i++){
+
+            if(program[order_number].first == "A"){
+                memory_blocks.push_front(register_ah + register_al);
+            }else if(program[order_number].first == "B"){
+                memory_blocks.push_front(register_bh + register_bl);
+            }else if(program[order_number].first == "C"){
+                memory_blocks.push_front(register_ch + register_cl);
+            }else if(program[order_number].first == "D"){
+                memory_blocks.push_front(register_dh + register_dl);
+            }else{
+                std::cout << "ERROR INT 4AH: Nie udalo sie wstawic zamiennego bloku pamieci\n";
+            }
+
+        }
+
     }else{
-        //ui->label_program->setText("ERROR: nieudane rozpoznanie\nrozkazu przy on_perform_step_button_clicked()");
+        std::cout << "ERROR: nieudane rozpoznanie\nrozkazu przy on_perform_step_button_clicked()\n";
     }
 
     order_number++;

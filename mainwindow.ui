@@ -4236,6 +4236,41 @@
       <string>POP</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>INT 0DH</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 41H</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 56H</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 47H</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 48H</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 49H</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>INT 4AH</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_one">
     <property name="geometry">
